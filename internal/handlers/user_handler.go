@@ -38,42 +38,61 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 	}
 	var user models.User
 	user.Model.ID = uint(tools.GenerateUUID())
-	user.Username = newUser.Username
-	user.Password = newUser.Password
-	user.Email = newUser.Email
-	user.First_Name = newUser.First_Name
-	user.Last_Name = newUser.Last_Name
-	user.Address = newUser.Address
-	fmt.Println(user)
+	if checkUser(c, user, newUser) {
+		return
+	}
 	if err := db.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, user)
 }
+
+func checkUser(c *gin.Context, user models.User, newUser models.UserDB) bool {
+	switch true {
+	case !user.SetFirstName(newUser.First_Name):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "First name is wrong formatted"})
+		return true
+	case !user.SetLastName(newUser.Last_Name):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "last name is wrong formatted"})
+		return true
+	case !user.SetUsername(newUser.Username):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username"})
+		return true
+	case !user.SetPassword(newUser.Password):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid password"})
+		return true
+	case !user.SetEmail(newUser.Email):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email"})
+		return true
+	case !user.SetAddress(newUser.Address):
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid address"})
+		return true
+	}
+	return false
+}
 func UpdateUser(c *gin.Context, db *gorm.DB) {
 	var user models.User
 	id := c.Param("id")
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+	if !models.UserExists(db, tools.ConvertStringToUint(id)) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
 	}
 	var newUser models.UserDB
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	user.Username = newUser.Username
-	user.Password = newUser.Password
-	user.Email = newUser.Email
-	user.First_Name = newUser.First_Name
-	user.Last_Name = newUser.Last_Name
-	user.Address = newUser.Address
+	if checkUser(c, user, newUser) {
+		return
+	}
 	db.Save(&user)
 	c.JSON(http.StatusOK, user)
 }
 func DeleteUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
+	if !models.UserExists(db, tools.ConvertStringToUint(id)) {
+		return
+	}
 	if err := db.Where("id = ?", id).Delete(&models.User{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting user"})
 		return
