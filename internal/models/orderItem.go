@@ -4,12 +4,21 @@ import (
 	"gorm.io/gorm"
 )
 
+type OrderItemDB struct {
+	gorm.Model
+	Order_ID   uint32  `json:"order_id"`
+	Product_ID uint32  `json:"product_id"`
+	Quantity   int     `json:"quantity"`
+	Subtotal   float64 `json:"subtotal"`
+}
+
 type OrderItem struct {
-	BaseModel
-	OrderID   uint
-	ProductID uint
-	Quantity  int
-	Subtotal  float64
+	gorm.Model
+	OrderItem_ID uint32  `json:"orderItem_id"`
+	Order_ID     uint32  `json:"order_id"`
+	Product_ID   uint32  `json:"product_id"`
+	Quantity     int     `json:"quantity"`
+	Subtotal     float64 `json:"subtotal"`
 }
 
 func GetAllOrderItems(db *gorm.DB) ([]OrderItem, error) {
