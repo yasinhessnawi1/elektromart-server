@@ -15,7 +15,7 @@ func main() {
 	config.LoadConfig()
 
 	// Correct MySQL connection string format
-	dsn := "root:@tcp(localhost:8080)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(localhost:8000)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -33,8 +33,41 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
 	})
+
+	// Setup routes in /cmd/main.go or wherever you configure routes
 	router.GET("/users", func(c *gin.Context) { handlers.GetUsers(c, db) })
+	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
+	router.PUT("/users/:id", func(c *gin.Context) { handlers.UpdateUser(c, db) })
+	router.DELETE("/users/:id", func(c *gin.Context) { handlers.DeleteUser(c, db) })
+
+	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
+	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
+	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })
+	router.DELETE("/products/:id", func(c *gin.Context) { handlers.DeleteProduct(c, db) })
+
+	router.GET("/brand", func(c *gin.Context) { handlers.GetBrands(c, db) })
+	router.POST("/brand", func(c *gin.Context) { handlers.CreateBrand(c, db) })
+	router.PUT("/brand/:id", func(c *gin.Context) { handlers.UpdateBrand(c, db) })
+	router.DELETE("/brand/:id", func(c *gin.Context) { handlers.DeleteBrand(c, db) })
+
+	router.GET("/categories", func(c *gin.Context) { handlers.GetCategories(c, db) })
+	router.POST("/categories", func(c *gin.Context) { handlers.CreateCategory(c, db) })
+	router.PUT("/categories/:id", func(c *gin.Context) { handlers.UpdateCategory(c, db) })
+	router.DELETE("/categories/:id", func(c *gin.Context) { handlers.DeleteCategory(c, db) })
+
 	router.GET("/orders", func(c *gin.Context) { handlers.GetOrders(c, db) })
+	router.POST("/orders", func(c *gin.Context) { handlers.CreateOrder(c, db) })
+	router.PUT("/orders/:id", func(c *gin.Context) { handlers.UpdateOrder(c, db) })
+	router.DELETE("/orders/:id", func(c *gin.Context) { handlers.DeleteOrder(c, db) })
+
 	router.GET("/order_items", func(c *gin.Context) { handlers.GetOrderItems(c, db) })
+	router.POST("/order_items", func(c *gin.Context) { handlers.CreateOrderItem(c, db) })
+	router.PUT("/order_items/:id", func(c *gin.Context) { handlers.UpdateOrderItem(c, db) })
+	router.DELETE("/order_items/:id", func(c *gin.Context) { handlers.DeleteOrderItem(c, db) })
+
 	router.GET("/payments", func(c *gin.Context) { handlers.GetPayments(c, db) })
+	router.POST("/payments", func(c *gin.Context) { handlers.CreatePayment(c, db) })
+	router.PUT("/payments/:id", func(c *gin.Context) { handlers.UpdatePayment(c, db) })
+	router.DELETE("/payments/:id", func(c *gin.Context) { handlers.DeletePayment(c, db) })
+
 }
