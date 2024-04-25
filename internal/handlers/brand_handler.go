@@ -11,7 +11,10 @@ import (
 func GetBrands(c *gin.Context, db *gorm.DB) {
 	brands, err := models.GetAllBrands(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving brands"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving brands", "error_message": err.Error()})
+		return
+	} else if len(brands) == 0 {
+		c.JSON(http.StatusOK, gin.H{"info": "No brands found, please create one first"})
 		return
 	}
 	c.JSON(http.StatusOK, brands)
@@ -19,13 +22,16 @@ func GetBrands(c *gin.Context, db *gorm.DB) {
 
 func GetBrand(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Brand ID not provided"})
+		return
+	}
 	var brand models.Brands
 	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
 	c.JSON(http.StatusOK, brand)
-
 }
 
 func CreateBrand(c *gin.Context, db *gorm.DB) {
@@ -36,6 +42,7 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 	}
 	var brand models.Brands
 	brand.Model.ID = uint(tools.GenerateUUID())
+
 	brand.Name = newBrand.Name
 	brand.Description = newBrand.Description
 	if err := db.Create(&brand).Error; err != nil {

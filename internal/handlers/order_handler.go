@@ -83,3 +83,19 @@ func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusNoContent, nil)
 }
+
+func HandleOrderEndpoint(c *gin.Context, db *gorm.DB) {
+
+	switch c.Request.Method {
+	case "GET":
+		GetOrders(c, db)
+	case "POST":
+		CreateOrder(c, db)
+	case "PUT":
+		UpdateOrder(c, db)
+	case "DELETE":
+		DeleteOrder(c, db)
+	default:
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
+	}
+}
