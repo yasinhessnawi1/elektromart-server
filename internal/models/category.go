@@ -4,10 +4,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type CategoryDB struct {
+	gorm.Model
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 type Category struct {
-	BaseModel
-	Name        string
-	Description string
+	gorm.Model
+	Category_ID uint32 `json:"category_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func GetAllCategories(db *gorm.DB) ([]Category, error) {
