@@ -16,6 +16,17 @@ func GetProducts(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusOK, products)
 }
+
+func GetProduct(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var product models.Product
+	if err := db.Where("id = ?", id).First(&product).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+	c.JSON(http.StatusOK, product)
+
+}
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.ProductDB
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
@@ -23,7 +34,7 @@ func CreateProduct(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var product models.Product
-	product.Product_ID = tools.GenerateUUID()
+	product.Model.ID = uint(tools.GenerateUUID())
 	product.Name = newProduct.Name
 	product.Description = newProduct.Description
 	product.Price = newProduct.Price

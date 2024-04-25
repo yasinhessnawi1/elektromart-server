@@ -17,6 +17,17 @@ func GetCategories(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusOK, categories)
 }
+
+func GetCategory(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var category models.Category
+	if err := db.Where("id = ?", id).First(&category).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
+		return
+	}
+	c.JSON(http.StatusOK, category)
+
+}
 func CreateCategory(c *gin.Context, db *gorm.DB) {
 	var newCategory models.CategoryDB
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
@@ -25,7 +36,7 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 	}
 	fmt.Println(newCategory)
 	var category models.Category
-	category.Category_ID = tools.GenerateUUID()
+	category.Model.ID = uint(tools.GenerateUUID())
 	category.Name = newCategory.Name
 	category.Description = newCategory.Description
 

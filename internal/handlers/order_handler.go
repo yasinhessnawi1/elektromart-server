@@ -24,7 +24,7 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var order models.Order
-	order.Order_ID = tools.GenerateUUID()
+	order.Model.ID = uint(tools.GenerateUUID())
 	order.User_ID = newOrder.User_ID
 	order.Order_date = newOrder.Order_date
 	order.Total_amount = newOrder.Total_amount
@@ -34,6 +34,17 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusCreated, order)
+
+}
+
+func GetOrder(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var order models.Order
+	if err := db.Where("id = ?", id).First(&order).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+	c.JSON(http.StatusOK, order)
 
 }
 

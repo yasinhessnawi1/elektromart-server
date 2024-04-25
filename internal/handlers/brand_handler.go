@@ -17,6 +17,17 @@ func GetBrands(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, brands)
 }
 
+func GetBrand(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var brand models.Brands
+	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
+		return
+	}
+	c.JSON(http.StatusOK, brand)
+
+}
+
 func CreateBrand(c *gin.Context, db *gorm.DB) {
 	var newBrand models.BrandsDB
 	if err := c.ShouldBindJSON(&newBrand); err != nil {
@@ -24,7 +35,7 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var brand models.Brands
-	brand.Brand_ID = tools.GenerateUUID()
+	brand.Model.ID = uint(tools.GenerateUUID())
 	brand.Name = newBrand.Name
 	brand.Description = newBrand.Description
 	if err := db.Create(&brand).Error; err != nil {
@@ -46,6 +57,8 @@ func UpdateBrand(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
+	brand.Name = updatedBrand.Name
+	brand.Description = updatedBrand.Description
 	if err := db.Where("id = ?", id).Updates(&brand).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

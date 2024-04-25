@@ -17,6 +17,17 @@ func GetOrderItems(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, orderItems)
 }
 
+func GetOrderItem(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var orderItem models.OrderItem
+	if err := db.Where("id = ?", id).First(&orderItem).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
+		return
+	}
+	c.JSON(http.StatusOK, orderItem)
+
+}
+
 func CreateOrderItem(c *gin.Context, db *gorm.DB) {
 	var newOrderItem models.OrderItemDB
 	if err := c.ShouldBindJSON(&newOrderItem); err != nil {
@@ -24,7 +35,7 @@ func CreateOrderItem(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var orderItem models.OrderItem
-	orderItem.OrderItem_ID = tools.GenerateUUID()
+	orderItem.Model.ID = uint(tools.GenerateUUID())
 	orderItem.Order_ID = newOrderItem.Order_ID
 	orderItem.Product_ID = newOrderItem.Product_ID
 	orderItem.Quantity = newOrderItem.Quantity
@@ -49,6 +60,10 @@ func UpdateOrderItem(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
 		return
 	}
+	orderItem.Order_ID = updatedOrderItem.Order_ID
+	orderItem.Product_ID = updatedOrderItem.Product_ID
+	orderItem.Quantity = updatedOrderItem.Quantity
+	orderItem.Subtotal = updatedOrderItem.Subtotal
 	if err := db.Where("id = ?", id).Updates(&orderItem).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -18,6 +18,17 @@ func GetUsers(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, users)
 }
 
+func GetUser(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	fmt.Println(id)
+	var user models.User
+	if err := db.Where("id = ?", id).First(&user).Limit(1).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
 // in /internal/handlers/user_handler.go
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var newUser models.UserDB
@@ -26,7 +37,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var user models.User
-	user.User_ID = tools.GenerateUUID()
+	user.Model.ID = uint(tools.GenerateUUID())
 	user.Username = newUser.Username
 	user.Password = newUser.Password
 	user.Email = newUser.Email

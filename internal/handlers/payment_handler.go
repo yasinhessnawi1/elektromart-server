@@ -17,6 +17,16 @@ func GetPayments(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, payments)
 }
 
+func GetPayment(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var payment models.Payment
+	if err := db.Where("id = ?", id).First(&payment).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
+		return
+	}
+	c.JSON(http.StatusOK, payment)
+}
+
 func CreatePayment(c *gin.Context, db *gorm.DB) {
 	var newPayment models.PaymentDB
 	if err := c.ShouldBindJSON(&newPayment); err != nil {
@@ -24,8 +34,8 @@ func CreatePayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var payment models.Payment
-	payment.Payment_ID = tools.GenerateUUID()
-	payment.Order_ID = newPayment.Order_ID
+	payment.Model.ID = uint(tools.GenerateUUID())
+	payment.Order_ID = newPayment.ID
 	payment.Payment_method = newPayment.Payment_method
 	payment.Amount = newPayment.Amount
 	payment.Payment_date = newPayment.Payment_date
@@ -49,7 +59,6 @@ func UpdatePayment(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		return
 	}
-	payment.Payment_ID = tools.GenerateUUID()
 	payment.Order_ID = updatedPayment.Order_ID
 	payment.Payment_method = updatedPayment.Payment_method
 	payment.Amount = updatedPayment.Amount
