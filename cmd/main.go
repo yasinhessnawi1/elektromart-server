@@ -3,6 +3,7 @@ package main
 import (
 	"E-Commerce_Website_Database/internal/config"
 	"E-Commerce_Website_Database/internal/handlers"
+	"E-Commerce_Website_Database/internal/tools"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/mysql"
@@ -20,12 +21,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-
-	router := gin.Default()
-
-	setupRoutes(router, db)
-
-	if err := router.Run(":8081"); err != nil {
+	r := gin.Default()
+	r.POST("/login", handlers.PostLogin)
+	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
+		username := c.MustGet("username").(string)
+		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
+	})
+	setupRoutes(r, db)
+	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
@@ -42,19 +45,8 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.DELETE("/users/:id", func(c *gin.Context) { handlers.DeleteUser(c, db) })
 
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
-	router.GET("/products/:name", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:category", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:brand", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:minPrice", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:maxPrice", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:stock", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:sort", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:limit", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
-	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })
-	router.DELETE("/products/:id", func(c *gin.Context) { handlers.DeleteProduct(c, db) })
-
+	router.GET("/products/:id/:name/:category/:brand/:minPrice/:maxPrice/:stock/:sort",
+		func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.GET("/brand", func(c *gin.Context) { handlers.GetBrands(c, db) })
 	router.GET("/brand/:id", func(c *gin.Context) { handlers.GetBrand(c, db) })
 	router.POST("/brand", func(c *gin.Context) { handlers.CreateBrand(c, db) })
