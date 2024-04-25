@@ -4,12 +4,21 @@ import (
 	"gorm.io/gorm"
 )
 
+type OrderDB struct {
+	gorm.Model
+	User_ID      uint32  `json:"user_id"`
+	Order_date   string  `json:"order_date"`
+	Total_amount float64 `json:"total_amount"`
+	Status       string  `json:"status"`
+}
+
 type Order struct {
-	BaseModel
-	UserID      uint
-	OrderDate   string
-	TotalAmount float64
-	Status      string
+	gorm.Model
+	Order_ID     uint32  `json:"order_id"`
+	User_ID      uint32  `json:"user_id"`
+	Order_date   string  `json:"order_date"`
+	Total_amount float64 `json:"total_amount"`
+	Status       string  `json:"status"`
 }
 
 func GetAllOrders(db *gorm.DB) ([]Order, error) {
