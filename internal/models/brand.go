@@ -4,14 +4,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type Brand struct {
-	BaseModel
-	Name        string
-	Description string
+type BrandsDB struct {
+	gorm.Model
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
-func GetAllBrands(db *gorm.DB) ([]Brand, error) {
-	var brands []Brand
+type Brands struct {
+	gorm.Model
+	Brand_ID    uint32 `json:"brand_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func GetAllBrands(db *gorm.DB) ([]Brands, error) {
+	var brands []Brands
 	if err := db.Find(&brands).Error; err != nil {
 		return nil, err
 	}
