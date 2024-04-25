@@ -6,6 +6,7 @@ import (
 
 type PaymentDB struct {
 	gorm.Model
+	ID             uint32  `json:"id"`
 	Order_ID       uint32  `json:"order_id"`
 	Payment_method string  `json:"payment_method"`
 	Amount         float64 `json:"amount"`
@@ -15,7 +16,6 @@ type PaymentDB struct {
 
 type Payment struct {
 	gorm.Model
-	Payment_ID     uint32  `json:"payment_id"`
 	Order_ID       uint32  `json:"order_id"`
 	Payment_method string  `json:"payment_method"`
 	Amount         float64 `json:"amount"`

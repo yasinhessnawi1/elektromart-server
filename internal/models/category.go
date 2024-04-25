@@ -12,7 +12,7 @@ type CategoryDB struct {
 
 type Category struct {
 	gorm.Model
-	Category_ID uint32 `json:"category_id"`
+	ID          uint32 `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

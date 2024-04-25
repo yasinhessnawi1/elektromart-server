@@ -12,7 +12,7 @@ type BrandsDB struct {
 
 type Brands struct {
 	gorm.Model
-	Brand_ID    uint32 `json:"brand_id"`
+	ID          uint32 `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

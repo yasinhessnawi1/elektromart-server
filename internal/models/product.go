@@ -16,7 +16,7 @@ type ProductDB struct {
 
 type Product struct {
 	gorm.Model
-	Product_ID     uint32  `json:"product_id"`
+	ID             uint32  `json:"id"`
 	Name           string  ` json:"name"`
 	Description    string  `json:"description"`
 	Price          float64 `json:"price"`
