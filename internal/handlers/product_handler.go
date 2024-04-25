@@ -6,9 +6,47 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
 func GetProducts(c *gin.Context, db *gorm.DB) {
+	// Default values for pagination
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	// Calculate offset based on page number and limit
+	offset := (page - 1) * limit
+
+	// Filters based on query parameters
+	if category := c.Query("category"); category != "" {
+		db = db.Where("category_id = ?", category)
+	}
+	if brand := c.Query("brand"); brand != "" {
+		db = db.Where("brand_id = ?", brand)
+	}
+	if name := c.Query("name"); name != "" {
+		db = db.Where("name LIKE ?", "%"+name+"%")
+	}
+	if minPrice := c.Query("minPrice"); minPrice != "" {
+		db = db.Where("price >= ?", minPrice)
+	}
+	if maxPrice := c.Query("maxPrice"); maxPrice != "" {
+		db = db.Where("price <= ?", maxPrice)
+	}
+	if stock := c.Query("stock"); stock != "" {
+		db = db.Where("stock_quantity >= ?", stock)
+	}
+	if sort := c.Query("sort"); sort != "" {
+		db = db.Order(sort)
+	}
+
+	// Setting limit and offset for pagination
+	db = db.Offset(offset).Limit(limit)
+
+	getAllProducts(c, db)
+}
+
+func getAllProducts(c *gin.Context, db *gorm.DB) {
 	products, err := models.GetAllProducts(db)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving products"})
