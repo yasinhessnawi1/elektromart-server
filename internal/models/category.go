@@ -1,6 +1,7 @@
 package models
 
 import (
+	"E-Commerce_Website_Database/internal/tools"
 	"gorm.io/gorm"
 )
 
@@ -23,4 +24,30 @@ func GetAllCategories(db *gorm.DB) ([]Category, error) {
 		return nil, err
 	}
 	return categories, nil
+}
+
+func (c *Category) SetName(name string) bool {
+	if !tools.CheckString(name, 255) {
+		return false
+	} else {
+		c.Name = name
+		return true
+	}
+}
+
+func (c *Category) SetDescription(description string) bool {
+	if !tools.CheckString(description, 1000) {
+		return false
+	} else {
+		c.Description = description
+		return true
+	}
+}
+
+func CategoryExists(db *gorm.DB, id uint32) bool {
+	var category Category
+	if err := db.Where("id = ?", id).First(&category).Error; err != nil {
+		return false
+	}
+	return true
 }

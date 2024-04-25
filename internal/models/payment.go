@@ -1,6 +1,7 @@
 package models
 
 import (
+	"E-Commerce_Website_Database/internal/tools"
 	"gorm.io/gorm"
 )
 
@@ -29,4 +30,57 @@ func GetAllPayments(db *gorm.DB) ([]Payment, error) {
 		return nil, err
 	}
 	return payments, nil
+}
+
+func (p *Payment) SetOrderID(order_id uint32, db *gorm.DB) bool {
+	if !OrderExists(db, order_id) {
+		return false
+	} else {
+		p.Order_ID = order_id
+		return true
+	}
+}
+
+func (p *Payment) SetPaymentMethod(payment_method string) bool {
+	if !tools.CheckPaymentMethod(payment_method) {
+		return false
+	} else {
+		p.Payment_method = payment_method
+		return true
+	}
+}
+
+func (p *Payment) SetAmount(amount float64) bool {
+	if !tools.CheckFloat(amount) {
+		return false
+	} else {
+		p.Amount = amount
+		return true
+	}
+}
+
+func (p *Payment) SetPaymentDate(payment_date string) bool {
+	if !tools.CheckDate(payment_date) {
+		return false
+	} else {
+		p.Payment_date = payment_date
+		return true
+	}
+}
+
+func (p *Payment) SetStatus(status string) bool {
+	if !tools.CheckStatus(status, 255) {
+		return false
+	} else {
+		p.Status = status
+		return true
+	}
+}
+
+func PaymentExists(db *gorm.DB, id uint32) bool {
+	var payment Payment
+	if db.Where("id = ?", id).First(&payment).Error != nil {
+		return false
+	}
+	return true
 }

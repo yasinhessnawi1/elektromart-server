@@ -1,6 +1,7 @@
 package models
 
 import (
+	"E-Commerce_Website_Database/internal/tools"
 	"gorm.io/gorm"
 )
 
@@ -27,4 +28,41 @@ func GetAllOrders(db *gorm.DB) ([]Order, error) {
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (o *Order) SetUserID(user_id uint32, db *gorm.DB) {
+	if UserExists(db, user_id) {
+		o.User_ID = user_id
+	}
+}
+
+func (o *Order) SetOrderDate(order_date string) bool {
+	if !tools.CheckDate(order_date) {
+		return false
+	}
+	return true
+}
+
+func (o *Order) SetTotalAmount(total_amount float64) bool {
+	if !tools.CheckFloat(total_amount) {
+		return false
+	}
+	o.Total_amount = total_amount
+	return true
+}
+
+func (o *Order) SetStatus(status string) bool {
+	if !tools.CheckStatus(status, 255) {
+		return false
+	}
+	o.Status = status
+	return true
+}
+
+func OrderExists(db *gorm.DB, id uint32) bool {
+	var order Order
+	if db.Where("id = ?", id).First(&order).Error != nil {
+		return false
+	}
+	return true
 }
