@@ -95,9 +95,9 @@ func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, erro
 		}
 
 	}
+
 	if err := query.Find(&users).Debug().Error; err != nil {
 		return nil, err
 	}
-
 	return users, nil
 }

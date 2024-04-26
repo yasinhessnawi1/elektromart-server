@@ -34,12 +34,15 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
 	})
 	router.HandleMethodNotAllowed = true
+
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
 	})
+
 	router.NoMethod(func(c *gin.Context) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	})
+
 	// Setup routes in /cmd/main.go or wherever you configure routes
 	router.GET("/users", func(c *gin.Context) { handlers.GetUsers(c, db) })
 	router.GET("/users/:id", func(c *gin.Context) { handlers.GetUser(c, db) })
@@ -85,5 +88,4 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/payments", func(c *gin.Context) { handlers.CreatePayment(c, db) })
 	router.PUT("/payments/:id", func(c *gin.Context) { handlers.UpdatePayment(c, db) })
 	router.DELETE("/payments/:id", func(c *gin.Context) { handlers.DeletePayment(c, db) })
-
 }

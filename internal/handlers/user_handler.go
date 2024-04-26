@@ -12,21 +12,24 @@ import (
 
 func GetUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
-	fmt.Println(id)
 	var user models.User
+
 	if err := db.Where("id = ?", id).First(&user).Limit(1).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, user)
 }
 
 func GetUsers(c *gin.Context, db *gorm.DB) {
 	users, err := models.GetAllUsers(db)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving users"})
 		return
 	}
+
 	c.JSON(http.StatusOK, users)
 }
 
@@ -46,15 +49,18 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users", "details": err.Error()})
 		return
 	}
+
 	if len(users) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No users found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, users)
 }
 
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var newUser models.User
+
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
@@ -81,6 +87,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user", "details": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusCreated, user)
 }
 
@@ -97,6 +104,7 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
+
 	// Load the existing user
 	var user models.User
 	if err := db.First(&user, id).Error; err != nil {
@@ -121,23 +129,25 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user", "details": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, user)
 }
 
 func DeleteUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
-	fmt.Printf("Converted Id: %v\n", convertedId)
 
 	if !models.UserExists(db, convertedId) {
 		fmt.Println("User does not exist")
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+
 	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.User{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting user"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, gin.H{"message": "User deleted"})
 }
 
