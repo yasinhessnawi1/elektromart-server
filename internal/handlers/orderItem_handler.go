@@ -100,14 +100,19 @@ func UpdateOrderItem(c *gin.Context, db *gorm.DB) {
 
 func DeleteOrderItem(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
-	if err := db.Where("id = ?", id).First(&models.OrderItem{}).Error; err != nil {
+	convertedId := tools.ConvertStringToUint(id)
+
+	if !models.OrderItemExists(db, convertedId) {
+		fmt.Println("Order item does not exist")
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
 		return
 	}
-	if err := db.Where("id = ?", id).Delete(&models.OrderItem{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := db.Unscoped().Where("id = ?", id).Delete(&models.OrderItem{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting order item"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, nil)
 }
 
