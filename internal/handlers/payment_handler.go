@@ -61,26 +61,41 @@ func CreatePayment(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdatePayment(c *gin.Context, db *gorm.DB) {
-	var updatedPayment models.Payment
-	if err := c.ShouldBindJSON(&updatedPayment); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := tools.ConvertStringToUint(c.Param("id"))
+
+	if !models.PaymentExists(db, id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		return
 	}
+
+	var updatedPayment models.Payment
+	if err := c.ShouldBindJSON(&updatedPayment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
+		return
+	}
+
 	var payment models.Payment
-	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&payment).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		return
 	}
+
 	payment.Order_ID = updatedPayment.Order_ID
 	payment.Payment_method = updatedPayment.Payment_method
 	payment.Amount = updatedPayment.Amount
 	payment.Payment_date = updatedPayment.Payment_date
 	payment.Status = updatedPayment.Status
-	if err := db.Where("id = ?", id).Updates(&payment).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if failed, err := checkPayment(payment, updatedPayment, db); failed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
+
+	if err := db.Save(&payment).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update payment", "details": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, payment)
 }
 
