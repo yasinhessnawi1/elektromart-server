@@ -94,3 +94,20 @@ func UserExists(db *gorm.DB, id uint32) bool {
 	}
 	return true
 }
+
+func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, error) {
+	var users []User
+	query := db.Model(&User{})
+
+	for key, value := range searchParams {
+		if strVal, ok := value.(string); ok {
+			query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+		}
+
+	}
+	if err := query.Find(&users).Debug().Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}

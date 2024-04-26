@@ -1,6 +1,9 @@
 package tools
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"strconv"
+)
 
 // GenerateUUID generates a new UUID and returns it as a string.
 func GenerateUUID() uint32 {
@@ -9,10 +12,10 @@ func GenerateUUID() uint32 {
 }
 
 func ConvertStringToUint(id string) uint32 {
-	newID, err := uuid.Parse(id)
+	newID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		return 0
 	}
-	return newID.ID()
+	return uint32(newID)
 
 }

@@ -22,13 +22,13 @@ func main() {
 	}
 
 	router := gin.Default()
-
 	setupRoutes(router, db)
 
 	if err := router.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
+
 func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
@@ -46,6 +46,9 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
 	router.PUT("/users/:id", func(c *gin.Context) { handlers.UpdateUser(c, db) })
 	router.DELETE("/users/:id", func(c *gin.Context) { handlers.DeleteUser(c, db) })
+	// Here you should use Query Param Like :search-users/?username={The username}  or search-users/?email={The email}
+	//`or by first name , last name , or address`.
+	router.GET("/search-users/", func(c *gin.Context) { handlers.SearchAllUsers(c, db) })
 
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
 	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
