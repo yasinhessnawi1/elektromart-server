@@ -61,25 +61,40 @@ func CreateOrderItem(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateOrderItem(c *gin.Context, db *gorm.DB) {
-	var updatedOrderItem models.OrderItem
-	if err := c.ShouldBindJSON(&updatedOrderItem); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := tools.ConvertStringToUint(c.Param("id"))
+
+	if !models.OrderItemExists(db, id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
 		return
 	}
+
+	var updatedOrderItem models.OrderItem
+	if err := c.ShouldBindJSON(&updatedOrderItem); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
+		return
+	}
+
 	var orderItem models.OrderItem
-	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&orderItem).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
 		return
 	}
+
 	orderItem.Order_ID = updatedOrderItem.Order_ID
 	orderItem.Product_ID = updatedOrderItem.Product_ID
 	orderItem.Quantity = updatedOrderItem.Quantity
 	orderItem.Subtotal = updatedOrderItem.Subtotal
-	if err := db.Where("id = ?", id).Updates(&orderItem).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if failed, err := checkOrderItem(orderItem, updatedOrderItem, db); failed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
+
+	if err := db.Save(&orderItem).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order item", "details": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, orderItem)
 }
 
