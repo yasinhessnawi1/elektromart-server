@@ -42,7 +42,6 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 			searchParams[field] = cleanValue
 		}
 	}
-	fmt.Println("Received search parameters:", searchParams)
 
 	users, err := models.SearchUsers(db, searchParams)
 	if err != nil {

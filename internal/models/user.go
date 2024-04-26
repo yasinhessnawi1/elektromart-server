@@ -93,7 +93,6 @@ func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, erro
 		if strVal, ok := value.(string); ok {
 			query = query.Where(key+" LIKE ?", "%"+strVal+"%")
 		}
-
 	}
 
 	if err := query.Find(&users).Debug().Error; err != nil {

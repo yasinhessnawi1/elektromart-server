@@ -84,3 +84,40 @@ func ProductExists(db *gorm.DB, id uint32) bool {
 	}
 	return true
 }
+
+func SearchProduct(db *gorm.DB, searchParams map[string]interface{}) ([]Product, error) {
+	var products []Product
+	query := db.Model(&Product{})
+
+	for key, value := range searchParams {
+		switch key {
+		case "name", "description":
+			// For string fields
+			if strVal, ok := value.(string); ok {
+				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+			}
+		case "price":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "stock_quantity":
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+
+		case "brand_id", "category_id":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", uint32(numVal))
+			} else if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", uint32(numVal))
+			}
+		}
+	}
+
+	if err := query.Find(&products).Debug().Error; err != nil {
+		return nil, err
+	}
+	return products, nil
+}
