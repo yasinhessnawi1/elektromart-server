@@ -148,6 +148,7 @@ func DeleteProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting product"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, gin.H{"message": "Product deleted"})
 }
 

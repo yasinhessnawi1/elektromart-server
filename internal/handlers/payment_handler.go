@@ -101,14 +101,19 @@ func UpdatePayment(c *gin.Context, db *gorm.DB) {
 
 func DeletePayment(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
-	if err := db.Where("id = ?", id).First(&models.Payment{}).Error; err != nil {
+	convertedId := tools.ConvertStringToUint(id)
+
+	if !models.PaymentExists(db, convertedId) {
+		fmt.Println("Payment does not exist")
 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		return
 	}
-	if err := db.Where("id = ?", id).Delete(&models.Payment{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.Payment{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting payment"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, nil)
 }
 
