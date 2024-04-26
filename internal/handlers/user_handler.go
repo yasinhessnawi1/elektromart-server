@@ -54,7 +54,7 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 }
 
 func CreateUser(c *gin.Context, db *gorm.DB) {
-	var newUser models.UserDB
+	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
@@ -92,7 +92,7 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var newUser models.UserDB
+	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
@@ -129,19 +129,19 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 	convertedId := tools.ConvertStringToUint(id)
 	fmt.Printf("Converted Id: %v\n", convertedId)
 
-	if !models.UserExists(db, tools.ConvertStringToUint(id)) {
+	if !models.UserExists(db, convertedId) {
 		fmt.Println("User does not exist")
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-	if err := db.Where("id = ?", id).Delete(&models.User{}).Error; err != nil {
+	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.User{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting user"})
 		return
 	}
 	c.JSON(http.StatusNoContent, gin.H{"message": "User deleted"})
 }
 
-func checkUser(user models.User, newUser models.UserDB) (bool, error) {
+func checkUser(user models.User, newUser models.User) (bool, error) {
 	switch true {
 	case !user.SetFirstName(newUser.First_Name):
 		return true, fmt.Errorf("first name is wrong formatted")
