@@ -35,7 +35,7 @@ func GetBrand(c *gin.Context, db *gorm.DB) {
 }
 
 func CreateBrand(c *gin.Context, db *gorm.DB) {
-	var newBrand models.BrandsDB
+	var newBrand models.Brands
 	if err := c.ShouldBindJSON(&newBrand); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -53,7 +53,7 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateBrand(c *gin.Context, db *gorm.DB) {
-	var updatedBrand models.BrandsDB
+	var updatedBrand models.Brands
 	if err := c.ShouldBindJSON(&updatedBrand); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

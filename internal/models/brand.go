@@ -5,15 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type BrandsDB struct {
-	gorm.Model
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 type Brands struct {
 	gorm.Model
-	ID          uint32 `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

@@ -29,7 +29,7 @@ func GetCategory(c *gin.Context, db *gorm.DB) {
 
 }
 func CreateCategory(c *gin.Context, db *gorm.DB) {
-	var newCategory models.CategoryDB
+	var newCategory models.Category
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -47,7 +47,7 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusCreated, category)
 }
 func UpdateCategory(c *gin.Context, db *gorm.DB) {
-	var updatedCategory models.CategoryDB
+	var updatedCategory models.Category
 	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -28,7 +28,7 @@ func GetProduct(c *gin.Context, db *gorm.DB) {
 
 }
 func CreateProduct(c *gin.Context, db *gorm.DB) {
-	var newProduct models.ProductDB
+	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -55,7 +55,7 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
-	var newProduct models.ProductDB
+	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
