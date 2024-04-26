@@ -58,7 +58,7 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
 	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })
 	router.DELETE("/products/:id", func(c *gin.Context) { handlers.DeleteProduct(c, db) })
-	// Here you should use Query Param Like :search-products/?name={The name of product}  or search-users/?price={The price}
+	// Here you should use Query Param Like :search-products/?name={The name of product}  or search-products/?price={The price}
 	//`or by brand id , category id`.
 	router.GET("/search-products/", func(c *gin.Context) { handlers.SearchAllProducts(c, db) })
 
@@ -91,7 +91,11 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/payments", func(c *gin.Context) { handlers.CreatePayment(c, db) })
 	router.PUT("/payments/:id", func(c *gin.Context) { handlers.UpdatePayment(c, db) })
 	router.DELETE("/payments/:id", func(c *gin.Context) { handlers.DeletePayment(c, db) })
+	// Here you should use Query Param Like :search-payments/?payment_method={cash}  or search-payments/?amount={The amount}
+	//`or by order id `.
+	router.GET("/search-payments/", func(c *gin.Context) { handlers.SearchAllPayments(c, db) })
 }
+
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

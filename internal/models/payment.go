@@ -3,6 +3,7 @@ package models
 import (
 	"E-Commerce_Website_Database/internal/tools"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Payment struct {
@@ -73,4 +74,39 @@ func PaymentExists(db *gorm.DB, id uint32) bool {
 		return false
 	}
 	return true
+}
+
+func SearchPayment(db *gorm.DB, searchParams map[string]interface{}) ([]Payment, error) {
+	var products []Payment
+	query := db.Model(&Payment{})
+
+	for key, value := range searchParams {
+		valueStr, isString := value.(string)
+		switch key {
+		case "payment_method", "status":
+			// For string fields
+			if isString {
+				query = query.Where(key+" LIKE ?", "%"+strings.ToLower(valueStr)+"%")
+			}
+		case "amount":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "order_id":
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+
+		case "payment_date":
+			if isString {
+				query = query.Where(key+" = ?", valueStr)
+			}
+		}
+	}
+
+	if err := query.Find(&products).Debug().Error; err != nil {
+		return nil, err
+	}
+	return products, nil
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func GetPayment(c *gin.Context, db *gorm.DB) {
@@ -26,6 +28,45 @@ func GetPayments(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving payments"})
 		return
 	}
+	c.JSON(http.StatusOK, payments)
+}
+
+func SearchAllPayments(c *gin.Context, db *gorm.DB) {
+	searchParams := map[string]interface{}{}
+
+	for _, field := range []string{"order_id", "payment_method", "amount", "payment_date", "status"} {
+		if value := c.Query(field); value != "" {
+			cleanValue := strings.TrimSpace(value)
+			switch field {
+			case "order_id":
+				if numVal, err := strconv.Atoi(cleanValue); err == nil {
+					searchParams[field] = numVal
+				}
+			case "amount":
+				if numVal, err := strconv.ParseFloat(cleanValue, 64); err == nil {
+					searchParams[field] = numVal
+				}
+			case "payment_method", "status":
+				searchParams[field] = strings.ToLower(cleanValue)
+			case "payment_date":
+				searchParams[field] = cleanValue
+			default:
+				searchParams[field] = cleanValue
+			}
+		}
+	}
+
+	payments, err := models.SearchPayment(db, searchParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve payment", "details": err.Error()})
+		return
+	}
+
+	if len(payments) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No payments found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, payments)
 }
 

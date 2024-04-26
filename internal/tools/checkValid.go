@@ -55,6 +55,7 @@ func CheckEmail(email string) bool {
 }
 
 func CheckStatus(status string, i int) bool {
+	status = strings.ToLower(status)
 	validStatuses := []string{"pending", "shipped", "delivered", "returned", "cancelled", "refunded", "processing", "completed"}
 	for _, validStatus := range validStatuses {
 		if status == validStatus {
@@ -82,6 +83,7 @@ func CheckDate(date string) bool {
 }
 
 func CheckPaymentMethod(method string) bool {
+	method = strings.ToLower(method)
 	validMethods := []string{"credit card", "debit card", "paypal", "cash", "check"}
 	for _, validMethod := range validMethods {
 		if method == validMethod {
