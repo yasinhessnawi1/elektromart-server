@@ -13,9 +13,9 @@ import (
 
 func main() {
 	config.LoadConfig()
-
+	port := config.GetConfig("DATABASE_PORT")
 	// Correct MySQL connection string format
-	dsn := "root:@tcp(localhost:8000)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(localhost:" + port + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)

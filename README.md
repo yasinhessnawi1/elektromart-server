@@ -38,9 +38,7 @@ go get .
 4. Create a .env file in the root directory and populate it with your database credentials and other configurations:
 
 ```
-DB_USER=root
-DB_PASSWORD=password
-DB_NAME=ecommerce
+DATABASE_PORT=8000 (or your own database port)(found in the xamp in sql config)
 ```
 
 5. Run the application:
