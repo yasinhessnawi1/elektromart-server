@@ -73,7 +73,7 @@ func SearchAllPayments(c *gin.Context, db *gorm.DB) {
 func CreatePayment(c *gin.Context, db *gorm.DB) {
 	var newPayment models.Payment
 	if err := c.ShouldBindJSON(&newPayment); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
 

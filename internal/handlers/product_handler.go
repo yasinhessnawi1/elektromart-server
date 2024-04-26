@@ -65,7 +65,7 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
 
