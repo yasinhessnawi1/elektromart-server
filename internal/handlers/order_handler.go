@@ -18,7 +18,7 @@ func GetOrders(c *gin.Context, db *gorm.DB) {
 }
 
 func CreateOrder(c *gin.Context, db *gorm.DB) {
-	var newOrder models.OrderDB
+	var newOrder models.Order
 	if err := c.ShouldBindJSON(&newOrder); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -49,7 +49,7 @@ func GetOrder(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateOrder(c *gin.Context, db *gorm.DB) {
-	var updatedOrder models.OrderDB
+	var updatedOrder models.Order
 	if err := c.ShouldBindJSON(&updatedOrder); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

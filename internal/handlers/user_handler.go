@@ -31,7 +31,7 @@ func GetUser(c *gin.Context, db *gorm.DB) {
 
 // in /internal/handlers/user_handler.go
 func CreateUser(c *gin.Context, db *gorm.DB) {
-	var newUser models.UserDB
+	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -48,7 +48,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusCreated, user)
 }
 
-func checkUser(c *gin.Context, user models.User, newUser models.UserDB) bool {
+func checkUser(c *gin.Context, user models.User, newUser models.User) bool {
 	switch true {
 	case !user.SetFirstName(newUser.First_Name):
 		c.JSON(http.StatusBadRequest, gin.H{"error": "First name is wrong formatted"})
@@ -77,7 +77,7 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 	if !models.UserExists(db, tools.ConvertStringToUint(id)) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 	}
-	var newUser models.UserDB
+	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

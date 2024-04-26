@@ -28,14 +28,14 @@ func GetPayment(c *gin.Context, db *gorm.DB) {
 }
 
 func CreatePayment(c *gin.Context, db *gorm.DB) {
-	var newPayment models.PaymentDB
+	var newPayment models.Payment
 	if err := c.ShouldBindJSON(&newPayment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	var payment models.Payment
 	payment.Model.ID = uint(tools.GenerateUUID())
-	payment.Order_ID = newPayment.ID
+	payment.Order_ID = newPayment.Order_ID
 	payment.Payment_method = newPayment.Payment_method
 	payment.Amount = newPayment.Amount
 	payment.Payment_date = newPayment.Payment_date
@@ -48,7 +48,7 @@ func CreatePayment(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdatePayment(c *gin.Context, db *gorm.DB) {
-	var updatedPayment models.PaymentDB
+	var updatedPayment models.Payment
 	if err := c.ShouldBindJSON(&updatedPayment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

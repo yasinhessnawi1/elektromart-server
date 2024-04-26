@@ -5,15 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type CategoryDB struct {
-	gorm.Model
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 type Category struct {
 	gorm.Model
-	ID          uint32 `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
