@@ -22,8 +22,8 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 	setupRoutes(router, db)
-
 	if err := router.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
@@ -36,7 +36,7 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.HandleMethodNotAllowed = true
 
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint not found or method not allowed"})
 	})
 
 	router.NoMethod(func(c *gin.Context) {
@@ -91,4 +91,18 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/payments", func(c *gin.Context) { handlers.CreatePayment(c, db) })
 	router.PUT("/payments/:id", func(c *gin.Context) { handlers.UpdatePayment(c, db) })
 	router.DELETE("/payments/:id", func(c *gin.Context) { handlers.DeletePayment(c, db) })
+}
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+		} else {
+			c.Next()
+		}
+	}
 }
