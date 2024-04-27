@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,28 +12,6 @@ import (
 )
 
 var router = SetupRoutes()
-
-func TestGetBrandWithGin(t *testing.T) {
-	t.Run("Test GetBrand with valid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/1486838590", nil)
-		router.ServeHTTP(w, req)
-
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
-		}
-	})
-
-	t.Run("Test GetBrand with invalid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/148683", nil)
-		router.ServeHTTP(w, req)
-
-		if w.Code != http.StatusNotFound {
-			t.Errorf("Expected HTTP status 404 with an error, got %d", w.Code)
-		}
-	})
-}
 
 func SetupRoutes() *gin.Engine {
 	dsn := "root:@tcp(localhost:3306)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
@@ -103,11 +83,33 @@ func SetupRoutes() *gin.Engine {
 	return router
 }
 
+func TestGetBrandWithGin(t *testing.T) {
+	t.Run("Test GetBrand with valid ID", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/brand/1524773729", nil)
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
+		}
+	})
+
+	t.Run("Test GetBrand with invalid ID", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/brand/148683", nil)
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusNotFound {
+			t.Errorf("Expected HTTP status 404 with an error, got %d", w.Code)
+		}
+	})
+}
+
 func TestGetBrandsWithGin(t *testing.T) {
 
 	t.Run("Test GetBrands with valid ID", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/1486838590", nil)
+		req, _ := http.NewRequest("GET", "/brand/1524773729", nil)
 		router.ServeHTTP(w, req)
 
 		if w.Code != http.StatusOK {
@@ -128,5 +130,72 @@ func TestGetBrandsWithGin(t *testing.T) {
 			t.Log("Test passed")
 		}
 
+	})
+}
+
+func TestCreateBrand(t *testing.T) {
+	t.Run("Test CreateBrand with valid data", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		// Replace nil with the correct data
+		body := map[string]interface{}{
+			"name":        "Test Brand",
+			"description": "This is a test brand",
+		}
+		correctData, _ := json.Marshal(body)
+		req, _ := http.NewRequest("POST", "/brand", bytes.NewBuffer(correctData))
+		router.ServeHTTP(w, req)
+		if w.Code != http.StatusCreated {
+			t.Errorf("Expected HTTP status 201 Created, got %d", w.Code)
+		} else {
+			t.Log("Test passed")
+		}
+	})
+
+	t.Run("Test CreateBrand with invalid data", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		body := map[string]interface{}{
+			"test": "test",
+		}
+		incorrectData, _ := json.Marshal(body)
+		req, _ := http.NewRequest("POST", "/brand", bytes.NewBuffer(incorrectData))
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected HTTP status 500 Internal Server Error, got %d", w.Code)
+		} else {
+			t.Log("Test passed")
+		}
+	})
+}
+
+func TestUpdateBrand(t *testing.T) {
+	t.Run("Test UpdateBrand with valid data", func(t *testing.T) {
+		w := httptest.NewRecorder()
+
+		Body := map[string]interface{}{
+			"name":        "Test Brand",
+			"description": "This is a test brand",
+		}
+		bodyData, _ := json.Marshal(Body)
+		req, _ := http.NewRequest("PUT", "/brand/1524773729", bytes.NewBuffer(bodyData))
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
+		} else {
+			t.Log("Test passed")
+		}
+	})
+
+	t.Run("Test UpdateBrand with invalid data", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("PUT", "/brand/148683", nil)
+		router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected HTTP status 500 Internal Server Error, got %d", w.Code)
+		} else {
+			t.Log("Test passed")
+		}
 	})
 }
