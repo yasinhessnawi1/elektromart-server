@@ -62,6 +62,15 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	//`or by status`.
 	router.GET("/search-shippingDetails/", func(c *gin.Context) { handlers.SearchAllShippingDetails(c, db) })
 
+	router.GET("/reviews", func(c *gin.Context) { handlers.GetReviews(c, db) })
+	router.GET("/reviews/:id", func(c *gin.Context) { handlers.GetReview(c, db) })
+	router.POST("/reviews", func(c *gin.Context) { handlers.CreateReview(c, db) })
+	router.PUT("/reviews/:id", func(c *gin.Context) { handlers.UpdateReview(c, db) })
+	router.DELETE("/reviews/:id", func(c *gin.Context) { handlers.DeleteReview(c, db) })
+	// Here you should use Query Param Like :search-reviews/?product_id={exist ID}  or search-reviews/?comment={The comment}
+	//`or by rating, user_id , review_date`.
+	router.GET("/search-reviews/", func(c *gin.Context) { handlers.SearchAllReviews(c, db) })
+
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
 	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })

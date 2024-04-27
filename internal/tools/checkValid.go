@@ -38,6 +38,16 @@ func CheckInt(intToCheck int) bool {
 }
 
 /*
+CheckRating checks if the int is less than 0 or more than 5, returns true if it is not
+*/
+func CheckRating(intToCheck int) bool {
+	if intToCheck < 0 || intToCheck > 5 {
+		return false
+	}
+	return true
+}
+
+/*
 CheckFloat checks if the float is less than 0 returns true if it is not
 */
 func CheckFloat(floatToCheck float64) bool {
