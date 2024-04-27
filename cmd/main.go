@@ -11,8 +11,11 @@ import (
 	"net/http"
 )
 
+// main initializes the application, sets up database connections, and starts the HTTP server.
 func main() {
-	config.LoadConfig()
+	config.LoadConfig() // Load environment variables from .env file
+
+	// Set up database connection using the MySQL driver.
 	port := config.GetConfig("DATABASE_PORT")
 	// Correct MySQL connection string format
 	dsn := "root:@tcp(localhost:" + port + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
@@ -21,18 +24,21 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	// Set up the Gin router and middleware.
 	router := gin.Default()
-	router.Use(CORSMiddleware())
-	setupRoutes(router, db)
+	router.Use(CORSMiddleware()) // Apply CORS middleware to allow cross-origin requests.
+	setupRoutes(router, db)      // Set up API routes.
 	if err := router.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
 
+// setupRoutes defines all the routes and their handlers for the application.
 func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
 	})
+	// Handle requests for non-existent routes.
 	router.HandleMethodNotAllowed = true
 
 	router.NoRoute(func(c *gin.Context) {
@@ -43,7 +49,7 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	})
 
-	// Setup routes in /cmd/main.go or wherever you configure routes
+	// User routes
 	router.GET("/users", func(c *gin.Context) { handlers.GetUsers(c, db) })
 	router.GET("/users/:id", func(c *gin.Context) { handlers.GetUser(c, db) })
 	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
@@ -124,6 +130,7 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/search-payments/", func(c *gin.Context) { handlers.SearchAllPayments(c, db) })
 }
 
+// CORSMiddleware configures CORS (Cross-Origin Resource Sharing) headers to allow requests from specific origins.
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

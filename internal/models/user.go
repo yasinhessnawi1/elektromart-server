@@ -9,12 +9,12 @@ import (
 // It includes essential fields like Username, Password, Email, along with personal details such as First Name, Last Name, and Address.
 type User struct {
 	gorm.Model
-	Username   string `gorm:"unique" json:"username"` // Unique username for the user
-	Password   string `json:"password"`               // Password for the user (should be stored encrypted)
-	Email      string `gorm:"unique" json:"email"`    // Unique email address for the user
-	First_Name string `json:"first_name"`             // User's first name
-	Last_Name  string `json:"last_name"`              // User's last name
-	Address    string `json:"address"`                // User's address
+	Username   string `gorm:"unique" json:"username"`
+	Password   string `json:"password"`
+	Email      string `gorm:"unique" json:"email"`
+	First_Name string `json:"first_name"`
+	Last_Name  string `json:"last_name"`
+	Address    string `json:"address"`
 }
 
 // GetAllUsers retrieves all users from the database.
@@ -116,7 +116,7 @@ func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, erro
 		}
 	}
 
-	if err := query.Find(&users).Error; err != nil {
+	if err := query.Find(&users).Debug().Error; err != nil {
 		return nil, err
 	}
 	return users, nil

@@ -10,11 +10,11 @@ import (
 // It includes fields for the order ID, payment method, amount, payment date, and status, all of which include JSON serialization tags.
 type Payment struct {
 	gorm.Model
-	Order_ID       uint32  `json:"order_id"`       // The ID of the order associated with the payment
-	Payment_method string  `json:"payment_method"` // The method used for the payment
-	Amount         float64 `json:"amount"`         // The total amount of the payment
-	Payment_date   string  `json:"payment_date"`   // The date the payment was processed
-	Status         string  `json:"status"`         // The status of the payment
+	Order_ID       uint32  `json:"order_id"`
+	Payment_method string  `json:"payment_method"`
+	Amount         float64 `json:"amount"`
+	Payment_date   string  `json:"payment_date"`
+	Status         string  `json:"status"`
 }
 
 // GetAllPayments retrieves all payments from the database.

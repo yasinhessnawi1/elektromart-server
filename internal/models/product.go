@@ -9,12 +9,12 @@ import (
 // price, stock quantity, and associations with brand and category.
 type Product struct {
 	gorm.Model
-	Name           string  `json:"name"`           // Name of the product
-	Description    string  `json:"description"`    // Description of the product
-	Price          float64 `json:"price"`          // Price of the product
-	Stock_quantity int     `json:"stock_quantity"` // Quantity in stock
-	Brand_ID       uint32  `json:"brand_id"`       // Foreign key for the associated brand
-	Category_ID    uint32  `json:"category_id"`    // Foreign key for the associated category
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+	Price          float64 `json:"price"`
+	Stock_quantity int     `json:"stock_quantity"`
+	Brand_ID       uint32  `json:"brand_id"`
+	Category_ID    uint32  `json:"category_id"`
 }
 
 // GetAllProducts retrieves all products from the database.
@@ -112,15 +112,31 @@ func SearchProduct(db *gorm.DB, searchParams map[string]interface{}) ([]Product,
 	for key, value := range searchParams {
 		switch key {
 		case "name", "description":
+			// For string fields
 			if strVal, ok := value.(string); ok {
 				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
 			}
-		case "price", "stock_quantity", "brand_id", "category_id":
-			query = query.Where(key+" = ?", value)
+		case "price":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "stock_quantity":
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+
+		case "brand_id", "category_id":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", uint32(numVal))
+			} else if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", uint32(numVal))
+			}
 		}
 	}
 
-	if err := query.Find(&products).Error; err != nil {
+	if err := query.Find(&products).Debug().Error; err != nil {
 		return nil, err
 	}
 	return products, nil
