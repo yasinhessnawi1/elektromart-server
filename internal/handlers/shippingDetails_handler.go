@@ -23,12 +23,12 @@ func GetShippingDetail(c *gin.Context, db *gorm.DB) {
 }
 
 func GetShippingDetails(c *gin.Context, db *gorm.DB) {
-	shippingDetail, err := models.GetAllShippingDetails(db)
+	shippingDetails, err := models.GetAllShippingDetails(db)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving Shipping Details"})
 		return
 	}
-	c.JSON(http.StatusOK, shippingDetail)
+	c.JSON(http.StatusOK, shippingDetails)
 }
 
 func SearchAllShippingDetails(c *gin.Context, db *gorm.DB) {
