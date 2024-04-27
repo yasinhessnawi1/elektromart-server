@@ -59,24 +59,39 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateCategory(c *gin.Context, db *gorm.DB) {
-	var updatedCategory models.Category
-	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := tools.ConvertStringToUint(c.Param("id"))
+
+	if !models.CategoryExists(db, id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
+
+	var updatedCategory models.Category
+	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
+		return
+	}
+
 	var category models.Category
-	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&category).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
+
 	category.Name = updatedCategory.Name
 	category.Description = updatedCategory.Description
-	if err := db.Where("id = ?", id).Updates(&category).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if failed, err := checkCategory(category, updatedCategory, db); failed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, updatedCategory)
+
+	if err := db.Save(&category).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, category)
 }
 
 func DeleteCategory(c *gin.Context, db *gorm.DB) {
