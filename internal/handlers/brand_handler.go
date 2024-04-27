@@ -95,14 +95,19 @@ func UpdateBrand(c *gin.Context, db *gorm.DB) {
 
 func DeleteBrand(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
-	if err := db.Where("id = ?", id).First(&models.Brands{}).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
+	convertedId := tools.ConvertStringToUint(id)
+
+	if !models.BrandExists(db, convertedId) {
+		fmt.Println("Brands does not exist")
+		c.JSON(http.StatusNotFound, gin.H{"error": "Brands not found"})
 		return
 	}
-	if err := db.Where("id = ?", id).Delete(&models.Brands{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.Brands{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting brands"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, nil)
 }
 
