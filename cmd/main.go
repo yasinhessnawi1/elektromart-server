@@ -73,6 +73,8 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/categories", func(c *gin.Context) { handlers.CreateCategory(c, db) })
 	router.PUT("/categories/:id", func(c *gin.Context) { handlers.UpdateCategory(c, db) })
 	router.DELETE("/categories/:id", func(c *gin.Context) { handlers.DeleteCategory(c, db) })
+	// Here you should use Query Param Like :search-categories/?name={The name}  or search-categories/?description={The description}
+	router.GET("/search-categories/", func(c *gin.Context) { handlers.SearchAllCategories(c, db) })
 
 	router.GET("/orders", func(c *gin.Context) { handlers.GetOrders(c, db) })
 	router.GET("/orders/:id", func(c *gin.Context) { handlers.GetOrder(c, db) })

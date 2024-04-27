@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strings"
 )
 
 func GetCategory(c *gin.Context, db *gorm.DB) {
@@ -30,6 +31,30 @@ func GetCategories(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, categories)
 }
 
+func SearchAllCategories(c *gin.Context, db *gorm.DB) {
+	searchParams := map[string]interface{}{}
+
+	for _, field := range []string{"name", "description"} {
+		if value := c.Query(field); value != "" {
+			cleanValue := strings.TrimSpace(value)
+			searchParams[field] = cleanValue
+		}
+	}
+
+	categories, err := models.SearchCategory(db, searchParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve categories", "details": err.Error()})
+		return
+	}
+
+	if len(categories) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, categories)
+}
+
 func CreateCategory(c *gin.Context, db *gorm.DB) {
 	var newCategory models.Category
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
@@ -45,7 +70,7 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 		},
 	}
 
-	if failed, err := checkCategory(category, newCategory, db); failed {
+	if failed, err := checkCategory(category, newCategory); failed {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
@@ -81,7 +106,7 @@ func UpdateCategory(c *gin.Context, db *gorm.DB) {
 	category.Name = updatedCategory.Name
 	category.Description = updatedCategory.Description
 
-	if failed, err := checkCategory(category, updatedCategory, db); failed {
+	if failed, err := checkCategory(category, updatedCategory); failed {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
@@ -112,7 +137,7 @@ func DeleteCategory(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func checkCategory(category models.Category, newCategory models.Category, db *gorm.DB) (bool, error) {
+func checkCategory(category models.Category, newCategory models.Category) (bool, error) {
 	switch true {
 	case !category.SetName(newCategory.Name):
 		return true, fmt.Errorf("name is wrong formatted")
