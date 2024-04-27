@@ -15,6 +15,10 @@ func GetCategories(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving categories"})
 		return
 	}
+	if len(categories) == 0 {
+		c.JSON(http.StatusOK, gin.H{"info": "No categories found, please create one first"})
+		return
+	}
 	c.JSON(http.StatusOK, categories)
 }
 
@@ -25,6 +29,10 @@ func GetCategory(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
+	if !tools.CheckString(category.Name, 255) || !tools.CheckString(category.Description, 1000) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid category data"})
+		return
+	}
 	c.JSON(http.StatusOK, category)
 
 }
@@ -32,6 +40,10 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 	var newCategory models.Category
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !tools.CheckString(newCategory.Name, 255) || !tools.CheckString(newCategory.Description, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 	fmt.Println(newCategory)
@@ -50,6 +62,10 @@ func UpdateCategory(c *gin.Context, db *gorm.DB) {
 	var updatedCategory models.Category
 	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !tools.CheckString(updatedCategory.Name, 255) || !tools.CheckString(updatedCategory.Description, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 	var category models.Category

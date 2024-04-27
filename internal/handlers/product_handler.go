@@ -19,6 +19,10 @@ func GetProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
+	if !tools.CheckString(product.Name, 255) || !tools.CheckString(product.Description, 1000) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid product data"})
+		return
+	}
 	c.JSON(http.StatusOK, product)
 }
 
@@ -66,6 +70,14 @@ func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !tools.CheckString(newProduct.Name, 255) || !tools.CheckString(newProduct.Description, 1000) || !tools.CheckFloat(newProduct.Price) || !tools.CheckInt(newProduct.Stock_quantity) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+	if !models.BrandExists(db, newProduct.Brand_ID) || !models.CategoryExists(db, newProduct.Category_ID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 

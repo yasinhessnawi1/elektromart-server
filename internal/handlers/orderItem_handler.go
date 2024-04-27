@@ -24,6 +24,10 @@ func GetOrderItem(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order item not found"})
 		return
 	}
+	if !tools.CheckInt(orderItem.Quantity) || !tools.CheckFloat(orderItem.Subtotal) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid order item data"})
+		return
+	}
 	c.JSON(http.StatusOK, orderItem)
 
 }
@@ -32,6 +36,10 @@ func CreateOrderItem(c *gin.Context, db *gorm.DB) {
 	var newOrderItem models.OrderItem
 	if err := c.ShouldBindJSON(&newOrderItem); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !models.ProductExists(db, newOrderItem.Product_ID) || !tools.CheckInt(newOrderItem.Quantity) || !tools.CheckFloat(newOrderItem.Subtotal) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 	var orderItem models.OrderItem
@@ -53,6 +61,11 @@ func UpdateOrderItem(c *gin.Context, db *gorm.DB) {
 	if err := c.ShouldBindJSON(&updatedOrderItem); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+	if !models.ProductExists(db, updatedOrderItem.Product_ID) || !tools.CheckInt(updatedOrderItem.Quantity) || !tools.CheckFloat(updatedOrderItem.Subtotal) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+
 	}
 	var orderItem models.OrderItem
 	id := c.Param("id")

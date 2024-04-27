@@ -65,6 +65,11 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	if !tools.CheckString(newUser.Username, 255) || !tools.CheckString(newUser.Password, 255) || !tools.CheckString(newUser.Email, 255) || !tools.CheckString(newUser.First_Name, 255) || !tools.CheckString(newUser.Last_Name, 255) || !tools.CheckString(newUser.Address, 255) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
 	user := models.User{
 		Username:   newUser.Username,
 		Password:   newUser.Password,

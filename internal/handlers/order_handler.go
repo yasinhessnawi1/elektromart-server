@@ -23,6 +23,10 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if !tools.CheckDate(newOrder.Order_date) || !tools.CheckStatus(newOrder.Status, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
 	var order models.Order
 	order.Model.ID = uint(tools.GenerateUUID())
 	order.User_ID = newOrder.User_ID
@@ -44,6 +48,10 @@ func GetOrder(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
+	if !tools.CheckDate(order.Order_date) || !tools.CheckStatus(order.Status, 1000) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid order data"})
+		return
+	}
 	c.JSON(http.StatusOK, order)
 
 }
@@ -52,6 +60,10 @@ func UpdateOrder(c *gin.Context, db *gorm.DB) {
 	var updatedOrder models.Order
 	if err := c.ShouldBindJSON(&updatedOrder); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !tools.CheckDate(updatedOrder.Order_date) || !tools.CheckStatus(updatedOrder.Status, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 	var order models.Order

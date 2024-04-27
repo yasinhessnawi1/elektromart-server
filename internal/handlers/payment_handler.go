@@ -24,6 +24,10 @@ func GetPayment(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		return
 	}
+	if !tools.CheckInt(int(payment.Order_ID)) || !tools.CheckString(payment.Payment_method, 255) || !tools.CheckFloat(payment.Amount) || !tools.CheckDate(payment.Payment_date) || !tools.CheckString(payment.Status, 1000) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid payment data"})
+		return
+	}
 	c.JSON(http.StatusOK, payment)
 }
 
@@ -32,6 +36,11 @@ func CreatePayment(c *gin.Context, db *gorm.DB) {
 	if err := c.ShouldBindJSON(&newPayment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+	if !tools.CheckInt(int(newPayment.Order_ID)) || !tools.CheckString(newPayment.Payment_method, 255) || !tools.CheckFloat(newPayment.Amount) || !tools.CheckDate(newPayment.Payment_date) || !tools.CheckString(newPayment.Status, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+
 	}
 	var payment models.Payment
 	payment.Model.ID = uint(tools.GenerateUUID())
@@ -52,6 +61,11 @@ func UpdatePayment(c *gin.Context, db *gorm.DB) {
 	if err := c.ShouldBindJSON(&updatedPayment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+	if !tools.CheckInt(int(updatedPayment.Order_ID)) || !tools.CheckString(updatedPayment.Payment_method, 255) || !tools.CheckFloat(updatedPayment.Amount) || !tools.CheckDate(updatedPayment.Payment_date) || !tools.CheckString(updatedPayment.Status, 1000) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+
 	}
 	var payment models.Payment
 	id := c.Param("id")
