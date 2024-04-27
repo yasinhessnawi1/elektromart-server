@@ -79,6 +79,9 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/orders", func(c *gin.Context) { handlers.CreateOrder(c, db) })
 	router.PUT("/orders/:id", func(c *gin.Context) { handlers.UpdateOrder(c, db) })
 	router.DELETE("/orders/:id", func(c *gin.Context) { handlers.DeleteOrder(c, db) })
+	// Here you should use Query Param Like :search-orders/?user_id={exist ID}  or search-orders/?total_amount={The amount}
+	//`or by status`.
+	router.GET("/search-orders/", func(c *gin.Context) { handlers.SearchAllOrders(c, db) })
 
 	router.GET("/orderItems", func(c *gin.Context) { handlers.GetOrderItems(c, db) })
 	router.GET("/orderItems/:id", func(c *gin.Context) { handlers.GetOrderItem(c, db) })

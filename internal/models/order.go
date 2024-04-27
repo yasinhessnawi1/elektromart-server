@@ -3,6 +3,7 @@ package models
 import (
 	"E-Commerce_Website_Database/internal/tools"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Order struct {
@@ -59,4 +60,38 @@ func OrderExists(db *gorm.DB, id uint32) bool {
 		return false
 	}
 	return true
+}
+
+func SearchOrder(db *gorm.DB, searchParams map[string]interface{}) ([]Order, error) {
+	var orders []Order
+	query := db.Model(&Order{})
+
+	for key, value := range searchParams {
+		valueStr, isString := value.(string)
+		switch key {
+		case "user_id":
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "order_date":
+			if isString {
+				query = query.Where(key+" = ?", valueStr)
+			}
+		case "total_amount":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "status":
+			// For string fields
+			if isString {
+				query = query.Where(key+" LIKE ?", "%"+strings.ToLower(valueStr)+"%")
+			}
+		}
+	}
+
+	if err := query.Find(&orders).Debug().Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
 }

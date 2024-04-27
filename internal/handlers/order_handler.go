@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func GetOrder(c *gin.Context, db *gorm.DB) {
@@ -27,6 +29,45 @@ func GetOrders(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving orders"})
 		return
 	}
+	c.JSON(http.StatusOK, orders)
+}
+
+func SearchAllOrders(c *gin.Context, db *gorm.DB) {
+	searchParams := map[string]interface{}{}
+
+	for _, field := range []string{"user_id", "order_date", "total_amount", "status"} {
+		if value := c.Query(field); value != "" {
+			cleanValue := strings.TrimSpace(value)
+			switch field {
+			case "user_id":
+				if numVal, err := strconv.Atoi(cleanValue); err == nil {
+					searchParams[field] = numVal
+				}
+			case "order_date":
+				searchParams[field] = cleanValue
+			case "total_amount":
+				if numVal, err := strconv.ParseFloat(cleanValue, 64); err == nil {
+					searchParams[field] = numVal
+				}
+			case "status":
+				searchParams[field] = strings.ToLower(cleanValue)
+			default:
+				searchParams[field] = cleanValue
+			}
+		}
+	}
+
+	orders, err := models.SearchOrder(db, searchParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve order", "details": err.Error()})
+		return
+	}
+
+	if len(orders) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No orders found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, orders)
 }
 
