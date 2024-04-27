@@ -77,7 +77,7 @@ func PaymentExists(db *gorm.DB, id uint32) bool {
 }
 
 func SearchPayment(db *gorm.DB, searchParams map[string]interface{}) ([]Payment, error) {
-	var products []Payment
+	var payments []Payment
 	query := db.Model(&Payment{})
 
 	for key, value := range searchParams {
@@ -105,8 +105,8 @@ func SearchPayment(db *gorm.DB, searchParams map[string]interface{}) ([]Payment,
 		}
 	}
 
-	if err := query.Find(&products).Debug().Error; err != nil {
+	if err := query.Find(&payments).Debug().Error; err != nil {
 		return nil, err
 	}
-	return products, nil
+	return payments, nil
 }

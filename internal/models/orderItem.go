@@ -64,3 +64,32 @@ func OrderItemExists(db *gorm.DB, id uint32) bool {
 	}
 	return true
 }
+
+func SearchOrderItem(db *gorm.DB, searchParams map[string]interface{}) ([]OrderItem, error) {
+	var orderItems []OrderItem
+	query := db.Model(&OrderItem{})
+
+	for key, value := range searchParams {
+		switch key {
+		case "order_id", "product_id":
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "quantity":
+			// For numeric fields
+			if numVal, ok := value.(int); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		case "subtotal":
+			// For numeric fields
+			if numVal, ok := value.(float64); ok {
+				query = query.Where(key+" = ?", numVal)
+			}
+		}
+	}
+
+	if err := query.Find(&orderItems).Debug().Error; err != nil {
+		return nil, err
+	}
+	return orderItems, nil
+}
