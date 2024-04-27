@@ -9,6 +9,9 @@ import (
 	"net/http"
 )
 
+// GetCategories retrieves all categories from the database.
+// Responds with a list of categories if successful or an informational message if no categories exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
 func GetCategories(c *gin.Context, db *gorm.DB) {
 	categories, err := models.GetAllCategories(db)
 	if err != nil {
@@ -22,6 +25,8 @@ func GetCategories(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// GetCategory fetches a single category based on its ID provided in the URL path.
+// It checks for valid category data and returns an HTTP 200 OK with the category details or an error if not found or data is invalid.
 func GetCategory(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var category models.Category
@@ -34,8 +39,10 @@ func GetCategory(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusOK, category)
-
 }
+
+// CreateCategory handles the creation of a new category via JSON input.
+// It validates input and responds with the created category object or an error message on failure.
 func CreateCategory(c *gin.Context, db *gorm.DB) {
 	var newCategory models.Category
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
@@ -58,6 +65,9 @@ func CreateCategory(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusCreated, category)
 }
+
+// UpdateCategory modifies an existing category based on its ID.
+// It validates the input data and updates the category in the database, responding with the updated data or an error.
 func UpdateCategory(c *gin.Context, db *gorm.DB) {
 	var updatedCategory models.Category
 	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
@@ -82,6 +92,9 @@ func UpdateCategory(c *gin.Context, db *gorm.DB) {
 	}
 	c.JSON(http.StatusOK, updatedCategory)
 }
+
+// DeleteCategory removes a category from the database based on its ID.
+// It handles the deletion process and returns an HTTP 204 No Content on success or an error message if the category is not found or deletion fails.
 func DeleteCategory(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&models.Category{}).Error; err != nil {

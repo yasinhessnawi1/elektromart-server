@@ -5,16 +5,20 @@ import (
 	"gorm.io/gorm"
 )
 
+// User represents the user entity in the database.
+// It includes essential fields like Username, Password, Email, along with personal details such as First Name, Last Name, and Address.
 type User struct {
 	gorm.Model
-	Username   string `gorm:"unique" json:"username"`
-	Password   string `json:"password"`
-	Email      string `gorm:"unique" json:"email"`
-	First_Name string `json:"first_name"`
-	Last_Name  string `json:"last_name"`
-	Address    string `json:"address"`
+	Username   string `gorm:"unique" json:"username"` // Unique username for the user
+	Password   string `json:"password"`               // Password for the user (should be stored encrypted)
+	Email      string `gorm:"unique" json:"email"`    // Unique email address for the user
+	First_Name string `json:"first_name"`             // User's first name
+	Last_Name  string `json:"last_name"`              // User's last name
+	Address    string `json:"address"`                // User's address
 }
 
+// GetAllUsers retrieves all users from the database.
+// Returns a slice of User or an error if the fetch fails.
 func GetAllUsers(db *gorm.DB) ([]User, error) {
 	var users []User
 	if err := db.Find(&users).Error; err != nil {
@@ -23,6 +27,8 @@ func GetAllUsers(db *gorm.DB) ([]User, error) {
 	return users, nil
 }
 
+// SetUsername sets the username for the user after validating its uniqueness and length.
+// Returns true if the username is within the allowed length and unique, otherwise false.
 func (u *User) SetUsername(username string) bool {
 	if !tools.CheckString(username, 255) {
 		return false
@@ -32,6 +38,8 @@ func (u *User) SetUsername(username string) bool {
 	}
 }
 
+// SetPassword sets the password for the user after ensuring it meets security standards.
+// Returns true if the password is considered secure, otherwise false.
 func (u *User) SetPassword(password string) bool {
 	if !tools.CheckPassword(password) {
 		return false
@@ -41,6 +49,8 @@ func (u *User) SetPassword(password string) bool {
 	}
 }
 
+// SetEmail sets the email for the user after validating its format and uniqueness.
+// Returns true if the email is valid and unique, otherwise false.
 func (u *User) SetEmail(email string) bool {
 	if !tools.CheckEmail(email) {
 		return false
@@ -50,6 +60,8 @@ func (u *User) SetEmail(email string) bool {
 	}
 }
 
+// SetFirstName sets the first name of the user after validating its length.
+// Returns true if the first name is within the allowed length, otherwise false.
 func (u *User) SetFirstName(first_name string) bool {
 	if !tools.CheckString(first_name, 255) {
 		return false
@@ -59,6 +71,8 @@ func (u *User) SetFirstName(first_name string) bool {
 	}
 }
 
+// SetLastName sets the last name of the user after validating its length.
+// Returns true if the last name is within the allowed length, otherwise false.
 func (u *User) SetLastName(last_name string) bool {
 	if !tools.CheckString(last_name, 255) {
 		return false
@@ -68,6 +82,8 @@ func (u *User) SetLastName(last_name string) bool {
 	}
 }
 
+// SetAddress sets the address for the user after validating its length.
+// Returns true if the address is within the allowed length, otherwise false.
 func (u *User) SetAddress(address string) bool {
 	if !tools.CheckString(address, 255) {
 		return false
@@ -77,6 +93,8 @@ func (u *User) SetAddress(address string) bool {
 	}
 }
 
+// UserExists checks if a specific user exists in the database by their ID.
+// Returns true if the user exists, otherwise false.
 func UserExists(db *gorm.DB, id uint32) bool {
 	var user User
 	if db.First(&user, id).Error != nil {
@@ -85,6 +103,9 @@ func UserExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchUsers performs a search based on given search parameters.
+// It filters users based on criteria like username, email, first name, last name, and address.
+// Returns a slice of users that match the criteria or an error if the search fails.
 func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, error) {
 	var users []User
 	query := db.Model(&User{})
@@ -95,7 +116,7 @@ func SearchUsers(db *gorm.DB, searchParams map[string]interface{}) ([]User, erro
 		}
 	}
 
-	if err := query.Find(&users).Debug().Error; err != nil {
+	if err := query.Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil

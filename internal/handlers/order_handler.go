@@ -8,15 +8,19 @@ import (
 	"net/http"
 )
 
+// GetOrders handles the retrieval of all orders from the database.
+// It returns a JSON response with a list of orders or an error message if the retrieval fails.
 func GetOrders(c *gin.Context, db *gorm.DB) {
 	orders, err := models.GetAllOrders(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving orders"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving orders", "message": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, orders)
 }
 
+// CreateOrder handles the creation of a new order from JSON input.
+// It validates the input and persists the new order record in the database, returning the created order or an error message.
 func CreateOrder(c *gin.Context, db *gorm.DB) {
 	var newOrder models.Order
 	if err := c.ShouldBindJSON(&newOrder); err != nil {
@@ -38,9 +42,10 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusCreated, order)
-
 }
 
+// GetOrder retrieves a single order by ID from the database.
+// It checks the validity of the order data and returns the order details or appropriate error messages.
 func GetOrder(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var order models.Order
@@ -53,9 +58,10 @@ func GetOrder(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusOK, order)
-
 }
 
+// UpdateOrder handles the updating of an existing order based on the JSON input and the ID provided in the URL.
+// It validates the input and updates the order in the database, returning the updated order or an error message.
 func UpdateOrder(c *gin.Context, db *gorm.DB) {
 	var updatedOrder models.Order
 	if err := c.ShouldBindJSON(&updatedOrder); err != nil {
@@ -83,6 +89,8 @@ func UpdateOrder(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, updatedOrder)
 }
 
+// DeleteOrder removes an order from the database based on the ID provided in the URL.
+// It responds with HTTP 204 No Content on successful deletion or an error message if the order is not found or deletion fails.
 func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&models.Order{}).Error; err != nil {
@@ -96,8 +104,9 @@ func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// HandleOrderEndpoint routes the HTTP request based on the method to the appropriate handler.
+// It supports GET, POST, PUT, and DELETE methods for order management.
 func HandleOrderEndpoint(c *gin.Context, db *gorm.DB) {
-
 	switch c.Request.Method {
 	case "GET":
 		GetOrders(c, db)

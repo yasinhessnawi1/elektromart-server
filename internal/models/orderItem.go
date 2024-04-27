@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// OrderItem represents the order item model for an e-commerce transaction.
+// It includes foreign keys to Order and Product, as well as Quantity and Subtotal to detail the item specifics.
 type OrderItem struct {
 	gorm.Model
 	Order_ID   uint32  `json:"order_id"`
@@ -13,6 +15,8 @@ type OrderItem struct {
 	Subtotal   float64 `json:"subtotal"`
 }
 
+// GetAllOrderItems retrieves all order items from the database.
+// It returns a slice of OrderItem and an error if there is any issue during fetching.
 func GetAllOrderItems(db *gorm.DB) ([]OrderItem, error) {
 	var orderItems []OrderItem
 	if err := db.Find(&orderItems).Error; err != nil {
@@ -21,6 +25,8 @@ func GetAllOrderItems(db *gorm.DB) ([]OrderItem, error) {
 	return orderItems, nil
 }
 
+// SetOrderID validates and sets the Order_ID for an order item, ensuring the order exists.
+// It returns true if the order exists and the ID is successfully set; otherwise, it returns false.
 func (oi *OrderItem) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	if !OrderExists(db, order_id) {
 		return false
@@ -30,6 +36,8 @@ func (oi *OrderItem) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetProductID validates and sets the Product_ID for an order item, ensuring the product exists.
+// It returns true if the product exists and the ID is successfully set; otherwise, it returns false.
 func (oi *OrderItem) SetProductID(product_id uint32, db *gorm.DB) bool {
 	if !ProductExists(db, product_id) {
 		return false
@@ -39,6 +47,8 @@ func (oi *OrderItem) SetProductID(product_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetQuantity validates and sets the quantity of an order item.
+// It ensures the quantity is a positive integer before setting. Returns true if valid; otherwise false.
 func (oi *OrderItem) SetQuantity(quantity int) bool {
 	if !tools.CheckInt(quantity) {
 		return false
@@ -48,6 +58,8 @@ func (oi *OrderItem) SetQuantity(quantity int) bool {
 	}
 }
 
+// SetSubtotal validates and sets the subtotal for an order item.
+// It ensures the subtotal is a positive float before setting. Returns true if valid; otherwise false.
 func (oi *OrderItem) SetSubtotal(subtotal float64) bool {
 	if !tools.CheckFloat(subtotal) {
 		return false
@@ -57,6 +69,8 @@ func (oi *OrderItem) SetSubtotal(subtotal float64) bool {
 	}
 }
 
+// OrderItemExists checks if an order item exists in the database by its ID.
+// It returns true if the order item is found, otherwise returns false.
 func OrderItemExists(db *gorm.DB, id uint32) bool {
 	var orderItem OrderItem
 	if db.Where("id = ?", id).First(&orderItem).Error != nil {
