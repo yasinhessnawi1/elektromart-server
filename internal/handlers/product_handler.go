@@ -75,7 +75,7 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
 	if !tools.CheckString(newProduct.Name, 255) || !tools.CheckString(newProduct.Description, 1000) ||
@@ -165,6 +165,7 @@ func DeleteProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting product"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, gin.H{"message": "Product deleted"})
 }
 

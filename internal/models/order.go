@@ -39,7 +39,6 @@ func (o *Order) SetOrderDate(order_date string) bool {
 	if !tools.CheckDate(order_date) {
 		return false
 	}
-	o.Order_date = order_date
 	return true
 }
 

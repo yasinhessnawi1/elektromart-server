@@ -39,6 +39,7 @@ func GetCategory(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusOK, category)
+
 }
 
 // CreateCategory handles the creation of a new category via JSON input.

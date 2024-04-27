@@ -13,7 +13,7 @@ import (
 func GetOrders(c *gin.Context, db *gorm.DB) {
 	orders, err := models.GetAllOrders(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving orders", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving orders"})
 		return
 	}
 	c.JSON(http.StatusOK, orders)
@@ -42,6 +42,7 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusCreated, order)
+
 }
 
 // GetOrder retrieves a single order by ID from the database.

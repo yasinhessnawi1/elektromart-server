@@ -33,6 +33,7 @@ func GetOrderItem(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusOK, orderItem)
+
 }
 
 // CreateOrderItem handles the creation of a new order item from JSON input.

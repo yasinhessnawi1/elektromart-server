@@ -36,10 +36,6 @@ func GetBrand(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
-	if !tools.CheckString(brand.Name, 255) || !tools.CheckString(brand.Description, 1000) {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid brand data"})
-		return
-	}
 	c.JSON(http.StatusOK, brand)
 }
 
@@ -52,12 +48,9 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if !tools.CheckString(newBrand.Name, 255) || !tools.CheckString(newBrand.Description, 1000) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
 	var brand models.Brands
 	brand.Model.ID = uint(tools.GenerateUUID())
+
 	brand.Name = newBrand.Name
 	brand.Description = newBrand.Description
 	if err := db.Create(&brand).Error; err != nil {
@@ -79,10 +72,6 @@ func UpdateBrand(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
-		return
-	}
-	if !tools.CheckString(updatedBrand.Name, 255) || !tools.CheckString(updatedBrand.Description, 1000) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 	brand.Name = updatedBrand.Name

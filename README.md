@@ -474,7 +474,7 @@ Below are detailed descriptions of the API endpoints including request methods, 
 
 ### Category
 
-**GET /category**: Retrieves all categories.
+**GET /categories**: Retrieves all categories.
 **Response**: Status: 200 OK
 
 **Body**:
@@ -490,7 +490,7 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ]
 ```
 
-**POST /category**: Adds a new category to the catalog.
+**POST /categories**: Adds a new category to the catalog.
 
 **Request Body**:
 
@@ -512,7 +512,7 @@ Below are detailed descriptions of the API endpoints including request methods, 
 }
 ```
 
-**DELETE /category/{id}**: Deletes a category by ID.
+**DELETE /categories/{id}**: Deletes a category by ID.
 
 **Response**: Status: 200 OK
 
@@ -524,7 +524,7 @@ Below are detailed descriptions of the API endpoints including request methods, 
 }
 ```
 
-**PUT /category/{id}**: Updates a category by ID.
+**PUT /categories/{id}**: Updates a category by ID.
 
 **Request Body**:
 
