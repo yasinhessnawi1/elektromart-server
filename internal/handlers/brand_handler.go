@@ -43,6 +43,7 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 			ID: uint(tools.GenerateUUID()),
 		},
 	}
+
 	if failed, err := checkBrand(brand, newBrand); failed {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
@@ -57,24 +58,39 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateBrand(c *gin.Context, db *gorm.DB) {
-	var updatedBrand models.Brands
-	if err := c.ShouldBindJSON(&updatedBrand); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := tools.ConvertStringToUint(c.Param("id"))
+
+	if !models.BrandExists(db, id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
+
+	var updatedBrand models.Brands
+	if err := c.ShouldBindJSON(&updatedBrand); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
+		return
+	}
+
 	var brand models.Brands
-	id := c.Param("id")
 	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
+
 	brand.Name = updatedBrand.Name
 	brand.Description = updatedBrand.Description
-	if err := db.Where("id = ?", id).Updates(&brand).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if failed, err := checkBrand(brand, updatedBrand); failed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, updatedBrand)
+
+	if err := db.Save(&brand).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update brand", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, brand)
 }
 
 func DeleteBrand(c *gin.Context, db *gorm.DB) {
