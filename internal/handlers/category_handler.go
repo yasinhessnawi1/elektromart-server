@@ -58,7 +58,7 @@ func SearchAllCategories(c *gin.Context, db *gorm.DB) {
 func CreateCategory(c *gin.Context, db *gorm.DB) {
 	var newCategory models.Category
 	if err := c.ShouldBindJSON(&newCategory); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
 
