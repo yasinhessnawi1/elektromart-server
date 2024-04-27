@@ -21,9 +21,12 @@ func GetAllOrders(db *gorm.DB) ([]Order, error) {
 	return orders, nil
 }
 
-func (o *Order) SetUserID(user_id uint32, db *gorm.DB) {
-	if UserExists(db, user_id) {
+func (o *Order) SetUserID(user_id uint32, db *gorm.DB) bool {
+	if !UserExists(db, user_id) {
+		return false
+	} else {
 		o.User_ID = user_id
+		return true
 	}
 }
 

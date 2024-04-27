@@ -3,10 +3,23 @@ package handlers
 import (
 	"E-Commerce_Website_Database/internal/models"
 	"E-Commerce_Website_Database/internal/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
 )
+
+func GetOrder(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	var order models.Order
+
+	if err := db.Where("id = ?", id).First(&order).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+	c.JSON(http.StatusOK, order)
+
+}
 
 func GetOrders(c *gin.Context, db *gorm.DB) {
 	orders, err := models.GetAllOrders(db)
@@ -20,32 +33,31 @@ func GetOrders(c *gin.Context, db *gorm.DB) {
 func CreateOrder(c *gin.Context, db *gorm.DB) {
 	var newOrder models.Order
 	if err := c.ShouldBindJSON(&newOrder); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
-	var order models.Order
-	order.Model.ID = uint(tools.GenerateUUID())
-	order.User_ID = newOrder.User_ID
-	order.Order_date = newOrder.Order_date
-	order.Total_amount = newOrder.Total_amount
-	order.Status = newOrder.Status
+
+	order := models.Order{
+		User_ID:      newOrder.User_ID,
+		Order_date:   newOrder.Order_date,
+		Total_amount: newOrder.Total_amount,
+		Status:       newOrder.Status,
+		Model: gorm.Model{
+			ID: uint(tools.GenerateUUID()),
+		},
+	}
+
+	if failed, err := checkOrder(order, newOrder, db); failed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
+		return
+	}
+
 	if err := db.Create(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order", "details": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusCreated, order)
-
-}
-
-func GetOrder(c *gin.Context, db *gorm.DB) {
-	id := c.Param("id")
-	var order models.Order
-	if err := db.Where("id = ?", id).First(&order).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
-		return
-	}
-	c.JSON(http.StatusOK, order)
-
 }
 
 func UpdateOrder(c *gin.Context, db *gorm.DB) {
@@ -84,18 +96,16 @@ func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func HandleOrderEndpoint(c *gin.Context, db *gorm.DB) {
-
-	switch c.Request.Method {
-	case "GET":
-		GetOrders(c, db)
-	case "POST":
-		CreateOrder(c, db)
-	case "PUT":
-		UpdateOrder(c, db)
-	case "DELETE":
-		DeleteOrder(c, db)
-	default:
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
+func checkOrder(order models.Order, newOrder models.Order, db *gorm.DB) (bool, error) {
+	switch true {
+	case !order.SetUserID(newOrder.User_ID, db):
+		return true, fmt.Errorf("invalid user_id or not existing")
+	case !order.SetOrderDate(newOrder.Order_date):
+		return true, fmt.Errorf("order date is not expected")
+	case !order.SetTotalAmount(newOrder.Total_amount):
+		return true, fmt.Errorf("invalid amount")
+	case !order.SetStatus(newOrder.Status):
+		return true, fmt.Errorf("payment status is not expected")
 	}
+	return false, nil
 }
