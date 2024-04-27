@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strings"
 )
 
 func GetBrand(c *gin.Context, db *gorm.DB) {
@@ -26,6 +27,30 @@ func GetBrands(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving brands"})
 		return
 	}
+	c.JSON(http.StatusOK, brands)
+}
+
+func SearchAllBrands(c *gin.Context, db *gorm.DB) {
+	searchParams := map[string]interface{}{}
+
+	for _, field := range []string{"name", "description"} {
+		if value := c.Query(field); value != "" {
+			cleanValue := strings.TrimSpace(value)
+			searchParams[field] = cleanValue
+		}
+	}
+
+	brands, err := models.SearchBrand(db, searchParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve brands", "details": err.Error()})
+		return
+	}
+
+	if len(brands) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, brands)
 }
 
