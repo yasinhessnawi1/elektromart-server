@@ -96,14 +96,19 @@ func UpdateCategory(c *gin.Context, db *gorm.DB) {
 
 func DeleteCategory(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
-	if err := db.Where("id = ?", id).First(&models.Category{}).Error; err != nil {
+	convertedId := tools.ConvertStringToUint(id)
+
+	if !models.CategoryExists(db, convertedId) {
+		fmt.Println("Category does not exist")
 		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
-	if err := db.Where("id = ?", id).Delete(&models.Category{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.Category{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting category"})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, nil)
 }
 
