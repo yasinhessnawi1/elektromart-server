@@ -53,6 +53,15 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	//`or by first name , last name , or address`.
 	router.GET("/search-users/", func(c *gin.Context) { handlers.SearchAllUsers(c, db) })
 
+	router.GET("/shippingDetails", func(c *gin.Context) { handlers.GetShippingDetails(c, db) })
+	router.GET("/shippingDetails/:id", func(c *gin.Context) { handlers.GetShippingDetail(c, db) })
+	router.POST("/shippingDetails", func(c *gin.Context) { handlers.CreateShippingDetail(c, db) })
+	router.PUT("/shippingDetails/:id", func(c *gin.Context) { handlers.UpdateShippingDetail(c, db) })
+	router.DELETE("/shippingDetails/:id", func(c *gin.Context) { handlers.DeleteShippingDetail(c, db) })
+	// Here you should use Query Param Like :search-shippingDetails/?order_id={exist ID}  or search-shippingDetails/?address={The address}
+	//`or by status`.
+	router.GET("/search-shippingDetails/", func(c *gin.Context) { handlers.SearchAllShippingDetails(c, db) })
+
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
 	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
