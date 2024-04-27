@@ -619,3 +619,4 @@ Below are detailed descriptions of the API endpoints including request methods, 
     "message": "Brand updated successfully."
 }
 ```
+

@@ -3,145 +3,97 @@ package handlers
 import (
 	"E-Commerce_Website_Database/internal/models"
 	"E-Commerce_Website_Database/internal/tools"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
-	"strings"
 )
 
-func GetBrand(c *gin.Context, db *gorm.DB) {
-	id := c.Param("id")
-	var brand models.Brands
-
-	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
-		return
-	}
-	c.JSON(http.StatusOK, brand)
-}
-
+// GetBrands retrieves all brands from the database.
+// It sends an HTTP 200 OK response with a list of brands or a message if no brands exist.
+// In case of an error, it sends an HTTP 500 Internal Server Error.
 func GetBrands(c *gin.Context, db *gorm.DB) {
 	brands, err := models.GetAllBrands(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving brands"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving brands", "error_message": err.Error()})
+		return
+	} else if len(brands) == 0 {
+		c.JSON(http.StatusOK, gin.H{"info": "No brands found, please create one first"})
 		return
 	}
 	c.JSON(http.StatusOK, brands)
 }
 
-func SearchAllBrands(c *gin.Context, db *gorm.DB) {
-	searchParams := map[string]interface{}{}
-
-	for _, field := range []string{"name", "description"} {
-		if value := c.Query(field); value != "" {
-			cleanValue := strings.TrimSpace(value)
-			searchParams[field] = cleanValue
-		}
-	}
-
-	brands, err := models.SearchBrand(db, searchParams)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve brands", "details": err.Error()})
+// GetBrand fetches a single brand based on the ID provided in the URL.
+// It returns the brand if found or appropriate error messages for missing ID or not found scenarios.
+func GetBrand(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Brand ID not provided"})
 		return
 	}
-
-	if len(brands) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, brands)
-}
-
-func CreateBrand(c *gin.Context, db *gorm.DB) {
-	var newBrand models.Brands
-	if err := c.ShouldBindJSON(&newBrand); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
-		return
-	}
-
-	brand := models.Brands{
-		Name:        newBrand.Name,
-		Description: newBrand.Description,
-		Model: gorm.Model{
-			ID: uint(tools.GenerateUUID()),
-		},
-	}
-
-	if failed, err := checkBrand(brand, newBrand); failed {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
-		return
-	}
-
-	if err := db.Create(&brand).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create brand", "details": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, brand)
-}
-
-func UpdateBrand(c *gin.Context, db *gorm.DB) {
-	id := tools.ConvertStringToUint(c.Param("id"))
-
-	if !models.BrandExists(db, id) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
-		return
-	}
-
-	var updatedBrand models.Brands
-	if err := c.ShouldBindJSON(&updatedBrand); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
-		return
-	}
-
 	var brand models.Brands
 	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
 		return
 	}
-
-	brand.Name = updatedBrand.Name
-	brand.Description = updatedBrand.Description
-
-	if failed, err := checkBrand(brand, updatedBrand); failed {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
-		return
-	}
-
-	if err := db.Save(&brand).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update brand", "details": err.Error()})
-		return
-	}
-
 	c.JSON(http.StatusOK, brand)
 }
 
-func DeleteBrand(c *gin.Context, db *gorm.DB) {
-	id := c.Param("id")
-	convertedId := tools.ConvertStringToUint(id)
-
-	if !models.BrandExists(db, convertedId) {
-		fmt.Println("Brands does not exist")
-		c.JSON(http.StatusNotFound, gin.H{"error": "Brands not found"})
+// CreateBrand handles the creation of a new brand.
+// It validates the input and stores the new brand in the database.
+// Responds with the created brand or an error message.
+func CreateBrand(c *gin.Context, db *gorm.DB) {
+	var newBrand models.Brands
+	if err := c.ShouldBindJSON(&newBrand); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	var brand models.Brands
+	brand.Model.ID = uint(tools.GenerateUUID())
 
-	if err := db.Unscoped().Where("id = ?", convertedId).Delete(&models.Brands{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting brands"})
+	brand.Name = newBrand.Name
+	brand.Description = newBrand.Description
+	if err := db.Create(&brand).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusNoContent, nil)
+	c.JSON(http.StatusCreated, brand)
 }
 
-func checkBrand(brand models.Brands, newBrand models.Brands) (bool, error) {
-	switch true {
-	case !brand.SetName(newBrand.Name):
-		return true, fmt.Errorf("name is wrong formatted")
-	case !brand.SetDescription(newBrand.Description):
-		return true, fmt.Errorf("description is wrong formatted")
+// UpdateBrand modifies an existing brand based on the ID provided in the URL.
+// It updates the brand's name and description with the provided data and responds accordingly.
+func UpdateBrand(c *gin.Context, db *gorm.DB) {
+	var updatedBrand models.Brands
+	if err := c.ShouldBindJSON(&updatedBrand); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return false, nil
+	var brand models.Brands
+	id := c.Param("id")
+	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
+		return
+	}
+	brand.Name = updatedBrand.Name
+	brand.Description = updatedBrand.Description
+	if err := db.Where("id = ?", id).Updates(&brand).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updatedBrand)
+}
+
+// DeleteBrand removes a brand from the database based on the ID provided in the URL.
+// It responds with an HTTP 204 No Content on success or an error message if the brand is not found or if deletion fails.
+func DeleteBrand(c *gin.Context, db *gorm.DB) {
+	id := c.Param("id")
+	if err := db.Where("id = ?", id).First(&models.Brands{}).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
+		return
+	}
+	if err := db.Where("id = ?", id).Delete(&models.Brands{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusNoContent, nil)
 }

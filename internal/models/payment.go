@@ -6,15 +6,19 @@ import (
 	"strings"
 )
 
+// Payment represents the payment model associated with an order.
+// It includes fields for the order ID, payment method, amount, payment date, and status, all of which include JSON serialization tags.
 type Payment struct {
 	gorm.Model
-	Order_ID       uint32  `json:"order_id"`
-	Payment_method string  `json:"payment_method"`
-	Amount         float64 `json:"amount"`
-	Payment_date   string  `json:"payment_date"`
-	Status         string  `json:"status"`
+	Order_ID       uint32  `json:"order_id"`       // The ID of the order associated with the payment
+	Payment_method string  `json:"payment_method"` // The method used for the payment
+	Amount         float64 `json:"amount"`         // The total amount of the payment
+	Payment_date   string  `json:"payment_date"`   // The date the payment was processed
+	Status         string  `json:"status"`         // The status of the payment
 }
 
+// GetAllPayments retrieves all payments from the database.
+// It returns a slice of Payment objects and an error if there is any issue during fetching.
 func GetAllPayments(db *gorm.DB) ([]Payment, error) {
 	var payments []Payment
 	if err := db.Find(&payments).Error; err != nil {
@@ -23,6 +27,8 @@ func GetAllPayments(db *gorm.DB) ([]Payment, error) {
 	return payments, nil
 }
 
+// SetOrderID sets the order ID for the payment after verifying the existence of the order.
+// Returns true if the order exists and the ID is set; otherwise, it returns false.
 func (p *Payment) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	if !OrderExists(db, order_id) {
 		return false
@@ -32,6 +38,8 @@ func (p *Payment) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetPaymentMethod sets the payment method for the payment.
+// It validates the payment method to ensure it meets certain criteria (not implemented here) and returns true if valid.
 func (p *Payment) SetPaymentMethod(payment_method string) bool {
 	if !tools.CheckPaymentMethod(payment_method) {
 		return false
@@ -41,6 +49,8 @@ func (p *Payment) SetPaymentMethod(payment_method string) bool {
 	}
 }
 
+// SetAmount sets the amount of the payment.
+// It ensures the amount is valid as a float value and returns true if so; otherwise, it returns false.
 func (p *Payment) SetAmount(amount float64) bool {
 	if !tools.CheckFloat(amount) {
 		return false
@@ -50,6 +60,8 @@ func (p *Payment) SetAmount(amount float64) bool {
 	}
 }
 
+// SetPaymentDate sets the date of the payment.
+// It validates the date format and returns true if the date is valid; otherwise, it returns false.
 func (p *Payment) SetPaymentDate(payment_date string) bool {
 	if !tools.CheckDate(payment_date) {
 		return false
@@ -59,6 +71,8 @@ func (p *Payment) SetPaymentDate(payment_date string) bool {
 	}
 }
 
+// SetStatus sets the status of the payment.
+// It validates the status based on predefined criteria and returns true if the status is valid; otherwise, it returns false.
 func (p *Payment) SetStatus(status string) bool {
 	if !tools.CheckStatus(status, 255) {
 		return false
@@ -68,6 +82,8 @@ func (p *Payment) SetStatus(status string) bool {
 	}
 }
 
+// PaymentExists checks if a payment exists in the database by its ID.
+// It returns true if the payment is found, otherwise returns false.
 func PaymentExists(db *gorm.DB, id uint32) bool {
 	var payment Payment
 	if db.Where("id = ?", id).First(&payment).Error != nil {
