@@ -20,9 +20,12 @@ import (
 func main() {
 	config.LoadConfig()
 	dsn := os.Getenv("DATABASE_URL")
+	dbport := config.GetConfig("DATABASE_PORT")
+	port := config.GetConfig("PORT")
 	var db *gorm.DB
 	var err error // Declare the error variable outside to use it across blocks
 	if dsn != "" {
+		log.Printf("Connecting to database: %s", dsn)
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{}) // Use = to assign to the existing db variable
 		if err != nil {
 			log.Fatalf("Failed to connect to database: %v", err)
@@ -30,8 +33,7 @@ func main() {
 			log.Printf("Connected to database: %s", db.Name())
 		}
 	} else {
-		port := config.GetConfig("DATABASE_PORT")
-		dsn := "root:@tcp(localhost:" + port + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
+		dsn := "root:@tcp(localhost:" + dbport + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {
 			log.Fatalf("Failed to connect to database: %v", err)
@@ -56,7 +58,7 @@ func main() {
 	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
 
-	if err := r.Run(":8081"); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
