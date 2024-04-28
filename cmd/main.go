@@ -3,6 +3,7 @@ package main
 import (
 	"E-Commerce_Website_Database/internal/config"
 	"E-Commerce_Website_Database/internal/handlers"
+	"E-Commerce_Website_Database/internal/tools"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/mysql"
@@ -20,15 +21,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-
-	router := gin.Default()
-	router.Use(CORSMiddleware())
-	setupRoutes(router, db)
-	if err := router.Run(":8081"); err != nil {
+	r := gin.Default()
+	r.POST("/login", handlers.PostLogin)
+	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
+		username := c.MustGet("username").(string)
+		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
+	})
+	setupRoutes(r, db)
+	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
-
 func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
@@ -49,11 +52,10 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
 	router.PUT("/users/:id", func(c *gin.Context) { handlers.UpdateUser(c, db) })
 	router.DELETE("/users/:id", func(c *gin.Context) { handlers.DeleteUser(c, db) })
-	// Here you should use Query Param Like :search-users/?username={The username}  or search-users/?email={The email}
-	//`or by first name , last name , or address`.
-	router.GET("/search-users/", func(c *gin.Context) { handlers.SearchAllUsers(c, db) })
 
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
+	router.GET("/products/:id/:name/:category/:brand/:minPrice/:maxPrice/:stock/:sort",
+		func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
 	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })

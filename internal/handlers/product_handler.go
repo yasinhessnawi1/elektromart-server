@@ -14,7 +14,6 @@ import (
 func GetProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var product models.Product
-
 	if err := db.Where("id = ?", id).First(&product).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
@@ -61,7 +60,6 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, products)
 }
-
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
@@ -93,7 +91,6 @@ func CreateProduct(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusCreated, product)
 }
-
 func UpdateProduct(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -113,7 +110,6 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found during update"})
 		return
 	}
-
 	product.Name = newProduct.Name
 	product.Description = newProduct.Description
 	product.Price = newProduct.Price
@@ -133,7 +129,6 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, product)
 }
-
 func DeleteProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
