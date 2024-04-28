@@ -24,29 +24,40 @@ func GetProduct(c *gin.Context, db *gorm.DB) {
 func GetProducts(c *gin.Context, db *gorm.DB) {
 	products, err := models.GetAllProducts(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving products"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving products", "error_message": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, products)
 }
 
 func SearchAllProducts(c *gin.Context, db *gorm.DB) {
-	searchParams := map[string]interface{}{}
+	queryParam := c.Param("any") // Get the query parameter named 'any'
 
-	for _, field := range []string{"name", "description", "price", "stock_quantity", "brand_id", "category_id"} {
-		if value := c.Query(field); value != "" {
-			cleanValue := strings.TrimSpace(value)
-			switch field {
-			case "price", "stock_quantity", "brand_id", "category_id":
-				if numVal, err := strconv.ParseFloat(cleanValue, 64); err == nil {
-					searchParams[field] = numVal
-				}
-			default:
-				searchParams[field] = cleanValue
-			}
+	// Check if the query parameter is empty
+	if queryParam == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter 'any' is required"})
+		return
+	}
+
+	queryParam = strings.TrimSpace(queryParam) // Clean the input
+	searchParams := make(map[string]interface{})
+
+	// Define the fields to search in
+	searchFields := []string{"name", "description", "price", "stock_quantity", "brand_id", "category_id"}
+
+	// Populate the searchParams map with the same queryParam for all specified fields
+	for _, field := range searchFields {
+		switch field {
+		case "price", "stock_quantity", "brand_id", "category_id":
+			if numVal, err := strconv.ParseFloat(queryParam, 64); err == nil {
+				searchParams[field] = numVal // Use as a number if conversion is successful
+			} // If conversion fails, do not add to map - optional: handle this as needed
+		default:
+			searchParams[field] = queryParam // Use as a string
 		}
 	}
 
+	// Search for products with the populated parameters
 	products, err := models.SearchProduct(db, searchParams)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products", "details": err.Error()})
@@ -54,7 +65,7 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(products) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No product found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No products found"})
 		return
 	}
 

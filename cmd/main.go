@@ -4,22 +4,40 @@ import (
 	"E-Commerce_Website_Database/internal/config"
 	"E-Commerce_Website_Database/internal/handlers"
 	"E-Commerce_Website_Database/internal/tools"
+	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/lib/pq"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
 	config.LoadConfig()
-	port := config.GetConfig("DATABASE_PORT")
-	// Correct MySQL connection string format
-	dsn := "root:@tcp(localhost:" + port + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+	dsn := os.Getenv("DATABASE_URL")
+	var db *gorm.DB
+	var err error // Declare the error variable outside to use it across blocks
+	if dsn != "" {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{}) // Use = to assign to the existing db variable
+		if err != nil {
+			log.Fatalf("Failed to connect to database: %v", err)
+		} else {
+			log.Printf("Connected to database: %s", db.Name())
+		}
+	} else {
+		port := config.GetConfig("DATABASE_PORT")
+		dsn := "root:@tcp(localhost:" + port + ")/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err != nil {
+			log.Fatalf("Failed to connect to database: %v", err)
+		} else {
+			log.Printf("Connected to database: %s", db.Name())
+		}
 	}
 	r := gin.Default()
 	r.POST("/login", handlers.PostLogin)
@@ -27,11 +45,22 @@ func main() {
 		username := c.MustGet("username").(string)
 		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
 	})
+	// Configuring CORS
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true                                                              // Allow all origins
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"} // Allow all methods
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
+	corsConfig.AddExposeHeaders("Access-Control-Allow-Origin") // Add this line
+	// Allow headers
+	r.Use(LoggerMiddleware())
+	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
+
 	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
+
 func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
@@ -52,17 +81,18 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.POST("/users", func(c *gin.Context) { handlers.CreateUser(c, db) })
 	router.PUT("/users/:id", func(c *gin.Context) { handlers.UpdateUser(c, db) })
 	router.DELETE("/users/:id", func(c *gin.Context) { handlers.DeleteUser(c, db) })
+	// Here you should use Query Param Like :search-users/?username={The username}  or search-users/?email={The email}
+	//`or by first name , last name , or address`.
+	router.GET("/search-users/", func(c *gin.Context) { handlers.SearchAllUsers(c, db) })
 
 	router.GET("/products", func(c *gin.Context) { handlers.GetProducts(c, db) })
-	router.GET("/products/:id/:name/:category/:brand/:minPrice/:maxPrice/:stock/:sort",
-		func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.GET("/products/:id", func(c *gin.Context) { handlers.GetProduct(c, db) })
 	router.POST("/products", func(c *gin.Context) { handlers.CreateProduct(c, db) })
 	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })
 	router.DELETE("/products/:id", func(c *gin.Context) { handlers.DeleteProduct(c, db) })
 	// Here you should use Query Param Like :search-products/?name={The name of product}  or search-users/?price={The price}
 	//`or by brand id , category id`.
-	router.GET("/search-products/", func(c *gin.Context) { handlers.SearchAllProducts(c, db) })
+	router.GET("/search-products/:any", func(c *gin.Context) { handlers.SearchAllProducts(c, db) })
 
 	router.GET("/brand", func(c *gin.Context) { handlers.GetBrands(c, db) })
 	router.GET("/brand/:id", func(c *gin.Context) { handlers.GetBrand(c, db) })
@@ -94,17 +124,11 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.PUT("/payments/:id", func(c *gin.Context) { handlers.UpdatePayment(c, db) })
 	router.DELETE("/payments/:id", func(c *gin.Context) { handlers.DeletePayment(c, db) })
 }
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusOK)
-		} else {
-			c.Next()
-		}
+func LoggerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("Request received")
+		c.Next()
+		fmt.Println("Headers:", c.Writer.Header())
 	}
 }
