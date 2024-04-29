@@ -31,11 +31,7 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	r := gin.Default()
-	r.POST("/login", handlers.PostLogin)
-	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
-		username := c.MustGet("username").(string)
-		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
-	})
+
 	// Configuring CORS
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true                                                              // Allow all origins
@@ -46,7 +42,11 @@ func main() {
 	r.Use(LoggerMiddleware())
 	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
-
+	r.POST("/login", handlers.PostLogin)
+	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
+		username := c.MustGet("username").(string)
+		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
+	})
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
