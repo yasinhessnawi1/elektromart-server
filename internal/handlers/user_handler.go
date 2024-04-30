@@ -86,6 +86,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		First_Name: newUser.First_Name,
 		Last_Name:  newUser.Last_Name,
 		Address:    newUser.Address,
+		Role:       "regular",
 		Model: gorm.Model{
 			ID: uint(tools.GenerateUUID()),
 		},
