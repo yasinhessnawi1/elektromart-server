@@ -90,3 +90,13 @@ func CheckPaymentMethod(method string) bool {
 	}
 	return false
 }
+
+func CheckRole(role string) bool {
+	validRoles := []string{"admin", "regular"}
+	for _, validRole := range validRoles {
+		if role == validRole {
+			return true
+		}
+	}
+	return false
+}

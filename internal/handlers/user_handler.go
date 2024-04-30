@@ -167,3 +167,11 @@ func checkUser(user models.User, newUser models.User) (bool, error) {
 	}
 	return false, nil
 }
+
+func GetUserByUN(username string, db *gorm.DB) (*models.User, error) {
+	var user models.User
+	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

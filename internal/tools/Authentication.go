@@ -12,16 +12,6 @@ import (
 var mySigningKey = []byte("secret")
 
 // GenerateToken generates a JWT token
-func GenerateToken(username string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-
-	claims["username"] = username
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-
-	tokenString, err := token.SignedString(mySigningKey)
-	return tokenString, err
-}
 
 // TokenAuthMiddleware is the middleware for JWT authentication
 func TokenAuthMiddleware() gin.HandlerFunc {
@@ -49,4 +39,16 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 	}
+}
+
+func GenerateTokenWithClaims(username string, role string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256) // Create a new JWT token using HMAC with SHA-256
+	claims := token.Claims.(jwt.MapClaims)   // Use MapClaims for easy map-like syntax with claims
+
+	claims["username"] = username
+	claims["role"] = role
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix() // Token expiration set to 72 hours from now
+
+	tokenString, err := token.SignedString(mySigningKey) // Sign the token with our secret key
+	return tokenString, err
 }

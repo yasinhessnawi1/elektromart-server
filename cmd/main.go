@@ -42,7 +42,7 @@ func main() {
 	r.Use(LoggerMiddleware())
 	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
-	r.POST("/login", handlers.PostLogin)
+	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db) })
 	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
 		username := c.MustGet("username").(string)
 		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})

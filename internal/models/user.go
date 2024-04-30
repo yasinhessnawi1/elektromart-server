@@ -13,6 +13,7 @@ type User struct {
 	First_Name string `json:"first_name"`
 	Last_Name  string `json:"last_name"`
 	Address    string `json:"address"`
+	Role       string `json:"role"`
 }
 
 func GetAllUsers(db *gorm.DB) ([]User, error) {
@@ -21,6 +22,16 @@ func GetAllUsers(db *gorm.DB) ([]User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (u *User) SetRole(role string) bool {
+	if !tools.CheckRole(role) {
+		return false
+	} else {
+		u.Role = role
+		return true
+	}
+
 }
 
 func (u *User) SetUsername(username string) bool {
