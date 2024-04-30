@@ -45,7 +45,11 @@ func main() {
 	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db) })
 	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
 		username := c.MustGet("username").(string)
-		c.JSON(http.StatusOK, gin.H{"username": username, "message": "Welcome to the protected route!"})
+		user, err := handlers.GetUserByUN(username, db)
+		if err != nil {
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"username": username, "role": user.Role})
 	})
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
