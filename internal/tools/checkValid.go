@@ -19,8 +19,7 @@ func CheckString(stringToCheck string, maxLength int) bool {
 func CheckPassword(password string) bool {
 	if len(password) < 8 || !strings.ContainsAny(password, "1234567890") ||
 		!strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") ||
-		!strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") ||
-		!strings.ContainsAny(password, "!@#$%^&*()_+|~-=\\`{}[]:\";'<>?,./") {
+		!strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") {
 		return false
 	}
 	return true

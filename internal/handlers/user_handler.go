@@ -5,6 +5,7 @@ import (
 	"E-Commerce_Website_Database/internal/tools"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
 	"strings"
@@ -72,10 +73,15 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password", "details": err.Error()})
+		return
+	}
 
 	user := models.User{
 		Username:   newUser.Username,
-		Password:   newUser.Password,
+		Password:   string(hashedPassword),
 		Email:      newUser.Email,
 		First_Name: newUser.First_Name,
 		Last_Name:  newUser.Last_Name,

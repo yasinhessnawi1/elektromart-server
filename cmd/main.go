@@ -5,6 +5,7 @@ import (
 	"E-Commerce_Website_Database/internal/handlers"
 	"E-Commerce_Website_Database/internal/tools"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/mysql"
