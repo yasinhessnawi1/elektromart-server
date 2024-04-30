@@ -34,10 +34,10 @@ func main() {
 
 	// Configuring CORS
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true                                                              // Allow all origins
-	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"} // Allow all methods
-	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
-	corsConfig.AddExposeHeaders("Access-Control-Allow-Origin") // Add this line
+	corsConfig.AllowAllOrigins = true                                                               // Allow all origins
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}  // Allow all methods
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"} // Allow all headers
+	corsConfig.AddExposeHeaders("Access-Control-Allow-Origin")                                      // Add this line
 	// Allow headers
 	r.Use(LoggerMiddleware())
 	r.Use(cors.New(corsConfig))
