@@ -11,9 +11,12 @@ import (
 	"strings"
 )
 
+// GetProduct retrieves a single product by its ID.
+// It checks for the product's existence and validity of its data, then returns the product details or an error message.
 func GetProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var product models.Product
+
 	if err := db.Where("id = ?", id).First(&product).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
@@ -21,15 +24,19 @@ func GetProduct(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, product)
 }
 
+// GetProducts retrieves all products from the database.
+// It returns a JSON response with a list of products or an error message if the retrieval fails.
 func GetProducts(c *gin.Context, db *gorm.DB) {
 	products, err := models.GetAllProducts(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving products", "error_message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving products"})
 		return
 	}
 	c.JSON(http.StatusOK, products)
 }
 
+// SearchAllProducts performs a search on products based on provided query parameters.
+// It constructs a search query dynamically and returns the matching products or an appropriate error message.
 func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 	queryParam := c.Param("any") // Get the query parameter named 'any'
 
@@ -65,12 +72,15 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(products) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No products found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No product found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, products)
 }
+
+// CreateProduct handles the creation of a new product from JSON input.
+// It validates the input and stores the new product in the database, responding with the created product or an error message.
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
@@ -102,6 +112,9 @@ func CreateProduct(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusCreated, product)
 }
+
+// UpdateProduct handles the updating of an existing product.
+// It validates the provided input and updates the product in the database, responding with the updated product or an error message.
 func UpdateProduct(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -121,6 +134,7 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found during update"})
 		return
 	}
+
 	product.Name = newProduct.Name
 	product.Description = newProduct.Description
 	product.Price = newProduct.Price
@@ -140,6 +154,9 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, product)
 }
+
+// DeleteProduct handles the deletion of a product by its ID.
+// It validates the product's existence and removes it from the database, responding with an appropriate message.
 func DeleteProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -157,6 +174,8 @@ func DeleteProduct(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, gin.H{"message": "Product deleted"})
 }
 
+// checkProduct performs validation checks on product data.
+// It returns a boolean indicating failure and an error with the validation issue.
 func checkProduct(product models.Product, newProduct models.Product, db *gorm.DB) (bool, error) {
 	switch true {
 	case !product.SetName(newProduct.Name):

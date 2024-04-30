@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// GetUser retrieves a single user by ID from the URL parameters.
+// It returns the user details or an error message if the user is not found.
 func GetUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var user models.User
@@ -22,6 +24,8 @@ func GetUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, user)
 }
 
+// GetUsers retrieves all users from the database.
+// It returns a list of users or an error message if the retrieval fails.
 func GetUsers(c *gin.Context, db *gorm.DB) {
 	users, err := models.GetAllUsers(db)
 
@@ -33,6 +37,8 @@ func GetUsers(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, users)
 }
 
+// SearchAllUsers performs a search for users based on provided query parameters.
+// It constructs a search query dynamically and returns the matching users or an appropriate error message.
 func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -57,6 +63,8 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, users)
 }
 
+// CreateUser handles the creation of a new user from JSON input.
+// It validates the input and stores the new user in the database, responding with the created user or an error message.
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var newUser models.User
 
@@ -90,6 +98,8 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusCreated, user)
 }
 
+// UpdateUser handles updating an existing user.
+// It validates the user's existence and the provided input, then updates the user in the database.
 func UpdateUser(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -132,6 +142,8 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, user)
 }
 
+// DeleteUser handles the deletion of a user by ID.
+// It validates the user's existence and removes the user from the database, responding with an appropriate message.
 func DeleteUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -150,6 +162,8 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, gin.H{"message": "User deleted"})
 }
 
+// checkUser performs validation checks on user data.
+// It returns a boolean indicating failure and an error with the validation issue.
 func checkUser(user models.User, newUser models.User) (bool, error) {
 	switch true {
 	case !user.SetFirstName(newUser.First_Name):
