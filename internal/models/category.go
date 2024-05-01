@@ -64,7 +64,7 @@ func SearchCategory(db *gorm.DB, searchParams map[string]interface{}) ([]Categor
 		case "name", "description":
 			// For string fields
 			if strVal, ok := value.(string); ok {
-				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+				query = query.Where(key+" = ?", strVal)
 			}
 		}
 	}

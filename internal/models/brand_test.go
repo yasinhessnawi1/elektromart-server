@@ -93,7 +93,7 @@ func TestSearchBrand(t *testing.T) {
 	// Setup expectations
 	rows := sqlmock.NewRows([]string{"id", "name", "description"}).
 		AddRow(1, "Search Brand", "Matches Criteria")
-	mock.ExpectQuery("^SELECT \\* FROM \"brands\" WHERE").WithArgs("%Search Brand%").WillReturnRows(rows)
+	mock.ExpectQuery("^SELECT \\* FROM \"brands\" WHERE").WithArgs("Search Brand").WillReturnRows(rows)
 
 	// Call the function now
 	brands, err := SearchBrand(gormDB, map[string]interface{}{"name": "Search Brand"})
