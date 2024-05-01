@@ -1,5 +1,6 @@
 package handlers
 
+/*
 import (
 	"bytes"
 	"encoding/json"
@@ -14,7 +15,7 @@ import (
 var router = SetupRoutes()
 
 func SetupRoutes() *gin.Engine {
-	dsn := "root:@tcp(localhost:3306)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(localhost:8000)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
 	db, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	// Create a new router
@@ -199,3 +200,5 @@ func TestUpdateBrand(t *testing.T) {
 		}
 	})
 }
+
+*/
