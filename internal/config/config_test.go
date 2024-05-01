@@ -11,7 +11,7 @@ func TestLoadConfig(t *testing.T) {
 	// Create a temporary .env file
 	file, err := os.Create(".env")
 	if err != nil {
-		t.Fatalf("Failed to create temporary .env file: % v", err)
+		t.Fatalf("Failed to create temporary .env file: %v", err)
 	}
 	defer os.Remove(".env")
 
