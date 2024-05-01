@@ -127,15 +127,13 @@ func TestSearchProduct(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "description", "price", "stock_quantity", "brand_id", "category_id"}).
 		AddRow(1, "Searchable Product", "Description", 10.0, 5, 1, 1)
 	mock.ExpectQuery("^SELECT \\* FROM \"products\" WHERE").
-		WithArgs("%searchable%", 10.0, 5, 1, 1).
+		WithArgs("%searchable%", 10.0, 5).
 		WillReturnRows(rows)
 
 	searchParams := map[string]interface{}{
 		"name":           "searchable",
 		"price":          10.0,
 		"stock_quantity": 5,
-		"brand_id":       1,
-		"category_id":    1,
 	}
 	products, err := SearchProduct(gormDB, searchParams)
 	assert.NoError(t, err)

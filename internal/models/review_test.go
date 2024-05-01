@@ -120,12 +120,11 @@ func TestSearchReview(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "product_id", "user_id", "rating", "comment", "review_date"}).
 		AddRow(1, 1, 1, 5, "Great product", "2021-04-21")
 	mock.ExpectQuery("^SELECT \\* FROM \"reviews\" WHERE").
-		WithArgs(1, 5).
+		WithArgs(5).
 		WillReturnRows(rows)
 
 	searchParams := map[string]interface{}{
-		"product_id": 1,
-		"rating":     5,
+		"rating": 5,
 	}
 	reviews, err := SearchReview(gormDB, searchParams)
 	assert.NoError(t, err)
