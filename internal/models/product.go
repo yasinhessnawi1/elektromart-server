@@ -2,6 +2,7 @@ package models
 
 import (
 	"E-Commerce_Website_Database/internal/tools"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -107,36 +108,34 @@ func ProductExists(db *gorm.DB, id uint32) bool {
 // It returns a slice of products that match the criteria or an error if the search fails.
 func SearchProduct(db *gorm.DB, searchParams map[string]interface{}) ([]Product, error) {
 	var products []Product
-	query := db.Model(&Product{})
+	query := db.Model(&Product{}).Joins("JOIN brands ON brands.id = products.brand_id").Joins("JOIN categories ON categories.id = products.category_id")
 
 	for key, value := range searchParams {
 		switch key {
 		case "name", "description":
-			// For string fields
+			// For string fields like product name and description
 			if strVal, ok := value.(string); ok {
-				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+				query = query.Where(fmt.Sprintf("products.%s LIKE ?", key), "%"+strVal+"%")
 			}
-		case "price":
-			// For numeric fields
+		case "price", "stock_quantity":
+			// For numeric fields like price and stock quantity
 			if numVal, ok := value.(float64); ok {
-				query = query.Where(key+" = ?", numVal)
+				query = query.Where(fmt.Sprintf("products.%s = ?", key), numVal)
 			}
-		case "stock_quantity":
-			if numVal, ok := value.(int); ok {
-				query = query.Where(key+" = ?", numVal)
+		case "brand_name":
+			// For brand name search
+			if strVal, ok := value.(string); ok {
+				query = query.Where("brands.name LIKE ?", "%"+strVal+"%")
 			}
-
-		case "brand_id", "category_id":
-			// For numeric fields
-			if numVal, ok := value.(float64); ok {
-				query = query.Where(key+" = ?", uint32(numVal))
-			} else if numVal, ok := value.(int); ok {
-				query = query.Where(key+" = ?", uint32(numVal))
+		case "category_name":
+			// For category name search
+			if strVal, ok := value.(string); ok {
+				query = query.Where("categories.name LIKE ?", "%"+strVal+"%")
 			}
 		}
 	}
 
-	if err := query.Find(&products).Debug().Error; err != nil {
+	if err := query.Find(&products).Error; err != nil {
 		return nil, err
 	}
 	return products, nil
