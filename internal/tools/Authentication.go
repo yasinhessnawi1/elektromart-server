@@ -30,6 +30,12 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			return mySigningKey, nil
 		})
 
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token", "details": err.Error()})
+			c.Abort()
+			return
+		}
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("username", claims["username"])
 			c.Next()
