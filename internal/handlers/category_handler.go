@@ -51,12 +51,10 @@ func SearchAllCategories(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve categories", "details": err.Error()})
 		return
 	}
-
-	if len(categories) == 0 {
+	if !tools.CheckString(categories.Name, 250) && !tools.CheckString(categories.Description, 1000) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, categories)
 }
 

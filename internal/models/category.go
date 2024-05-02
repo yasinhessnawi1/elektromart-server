@@ -55,8 +55,8 @@ func CategoryExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
-func SearchCategory(db *gorm.DB, searchParams map[string]interface{}) ([]Category, error) {
-	var categories []Category
+func SearchCategory(db *gorm.DB, searchParams map[string]interface{}) (Category, error) {
+	var category Category
 	query := db.Model(&Category{})
 
 	for key, value := range searchParams {
@@ -64,13 +64,13 @@ func SearchCategory(db *gorm.DB, searchParams map[string]interface{}) ([]Categor
 		case "name", "description":
 			// For string fields
 			if strVal, ok := value.(string); ok {
-				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+				query = query.Where(key+" = ?", strVal)
 			}
 		}
 	}
 
-	if err := query.Find(&categories).Debug().Error; err != nil {
-		return nil, err
+	if err := query.First(&category).Debug().Error; err != nil {
+		return category, err
 	}
-	return categories, nil
+	return category, nil
 }

@@ -55,8 +55,8 @@ func BrandExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
-func SearchBrand(db *gorm.DB, searchParams map[string]interface{}) ([]Brands, error) {
-	var brands []Brands
+func SearchBrand(db *gorm.DB, searchParams map[string]interface{}) (Brands, error) {
+	var brands Brands
 	query := db.Model(&Brands{})
 
 	for key, value := range searchParams {
@@ -64,13 +64,13 @@ func SearchBrand(db *gorm.DB, searchParams map[string]interface{}) ([]Brands, er
 		case "name", "description":
 			// For string fields
 			if strVal, ok := value.(string); ok {
-				query = query.Where(key+" LIKE ?", "%"+strVal+"%")
+				query = query.Where(key+" = ?", strVal)
 			}
 		}
 	}
 
-	if err := query.Find(&brands).Debug().Error; err != nil {
-		return nil, err
+	if err := query.First(&brands).Debug().Error; err != nil {
+		return brands, err
 	}
 	return brands, nil
 }
