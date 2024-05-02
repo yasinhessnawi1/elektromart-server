@@ -46,7 +46,7 @@ func TestGetShippingDetail_Success(t *testing.T) {
 	order := models.Order{Total_amount: 150.50}
 	db.Create(&order)
 
-	shippingDetail := models.ShippingDetails{Order_ID: uint32(order.ID), Address: "123 Main St", Shipping_Date: "2023-04-01", Estimated_Arrival: "2023-04-05", Status: "shipped"}
+	shippingDetail := models.ShippingDetails{Order_ID: uint32(order.ID), Address: "123 First St", Shipping_Date: "2023-04-01", Estimated_Arrival: "2023-04-05", Status: "shipped"}
 	db.Create(&shippingDetail)
 
 	router.GET("/shippingDetails/:id", func(c *gin.Context) {
@@ -91,8 +91,8 @@ func TestGetShippingDetails_Success(t *testing.T) {
 	db.Create(&order)
 
 	shippingDetails := []models.ShippingDetails{
-		{Order_ID: uint32(order.ID), Address: "123 Main St", Shipping_Date: "2023-04-01", Estimated_Arrival: "2023-04-05", Status: "shipped"},
-		{Order_ID: uint32(order.ID), Address: "456 Side St", Shipping_Date: "2023-05-01", Estimated_Arrival: "2023-05-05", Status: "pending"},
+		{Order_ID: uint32(order.ID), Address: "123 First St", Shipping_Date: "2023-04-01", Estimated_Arrival: "2023-04-05", Status: "shipped"},
+		{Order_ID: uint32(order.ID), Address: "456 Second St", Shipping_Date: "2023-05-01", Estimated_Arrival: "2023-05-05", Status: "pending"},
 	}
 	for _, detail := range shippingDetails {
 		db.Create(&detail)
