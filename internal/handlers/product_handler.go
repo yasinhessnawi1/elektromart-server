@@ -53,6 +53,7 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
+	// Search for products based on the search parameters
 	products, err := models.SearchProduct(db, searchParams)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products", "details": err.Error()})
