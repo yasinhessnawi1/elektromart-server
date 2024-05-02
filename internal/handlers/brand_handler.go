@@ -52,7 +52,7 @@ func SearchAllBrands(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(brands) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No brands found"})
 		return
 	}
 

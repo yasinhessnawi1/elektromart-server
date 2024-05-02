@@ -42,7 +42,8 @@ func main() {
 	r.Use(LoggerMiddleware())
 	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
-	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db) })
+	jwtService := &tools.JWTTokenService{}
+	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db, jwtService) })
 	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
 		username := c.MustGet("username").(string)
 		user, err := handlers.GetUserByUN(username, db)

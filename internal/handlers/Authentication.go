@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func PostLogin(c *gin.Context, db *gorm.DB) {
+func PostLogin(c *gin.Context, db *gorm.DB, tokenService tools.TokenService) {
 	var loginCredentials struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -38,7 +38,7 @@ func PostLogin(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Generate token with claims
-	tokenString, err := tools.GenerateTokenWithClaims(user.Username, user.Role)
+	tokenString, err := tokenService.GenerateTokenWithClaims(user.Username, user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
 		return

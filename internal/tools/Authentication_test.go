@@ -10,9 +10,11 @@ import (
 )
 
 func TestGenerateTokenWithClaims(t *testing.T) {
+	tokenService := JWTTokenService{}
+
 	username := "testuser"
 	role := "admin"
-	tokenStr, err := GenerateTokenWithClaims(username, role)
+	tokenStr, err := tokenService.GenerateTokenWithClaims(username, role)
 	assert.Nil(t, err)
 
 	// check the claims
@@ -39,7 +41,8 @@ func TestTokenAuthMiddlewareWithValidToken(t *testing.T) {
 	})
 
 	// Valid token
-	token, _ := GenerateTokenWithClaims("testuser", "user")
+	tokenService := JWTTokenService{}
+	token, _ := tokenService.GenerateTokenWithClaims("testuser", "user")
 
 	// Create a test request with the valid token
 	w := httptest.NewRecorder()

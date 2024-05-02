@@ -47,7 +47,14 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func GenerateTokenWithClaims(username string, role string) (string, error) {
+// TokenService this interface make the testing service is more easy
+type TokenService interface {
+	GenerateTokenWithClaims(username, role string) (string, error)
+}
+
+type JWTTokenService struct{}
+
+func (service *JWTTokenService) GenerateTokenWithClaims(username string, role string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256) // Create a new JWT token using HMAC with SHA-256
 	claims := token.Claims.(jwt.MapClaims)   // Use MapClaims for easy map-like syntax with claims
 
