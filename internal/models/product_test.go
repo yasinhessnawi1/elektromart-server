@@ -126,7 +126,9 @@ func TestSearchProduct(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "name", "description", "price", "stock_quantity", "brand_id", "category_id"}).
 		AddRow(1, "Searchable Product", "Description", 10.0, 5, 1, 1)
-	mock.ExpectQuery("^SELECT \\* FROM \"products\" WHERE").
+
+	// match the actual query that is being executed
+	mock.ExpectQuery(`^SELECT "products"."id","products"."created_at","products"."updated_at","products"."deleted_at","products"."name","products"."description","products"."price","products"."stock_quantity","products"."brand_id","products"."category_id" FROM "products" JOIN brands ON brands.id = products.brand_id JOIN categories ON categories.id = products.category_id WHERE products.name LIKE \$1 AND "products"."deleted_at" IS NULL$`).
 		WithArgs("%searchable%").
 		WillReturnRows(rows)
 
