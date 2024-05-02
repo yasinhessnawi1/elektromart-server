@@ -19,6 +19,14 @@ performance and scalability.
 
 ## Setup and Installation
 
+##### If running sql server from localhost:
+
+1. To run sql database locally first install [xamp](https://www.apachefriends.org/)
+
+2. Then run xamp manager (it may ask for root/admin permission) and start MYSQL Database and Apache Web Server, take note of the ports used as well as database user, password and name (you will use them in the .evn file)
+
+##### Common steps for running locally or using deployed server
+
 Ensure you have Golang and MySQL installed on your system. Follow these steps to set up the API:
 
 1. Clone the repository:
@@ -39,7 +47,14 @@ go get .
 
 ```
 DATABASE_PORT=8000 (or your own database port)(found in the xamp in sql config)
+PORT=8081 (or another port you wish the program to handle from)
+DB_HOST=localhost:{port} (if you want to use the running local client)
+DB_PORT=3306 (port of the database default is 3306)
+DB_USER={user} (specify user used)
+DB_PASSWORD={password} (specify password of the database)
+DB_NAME={name} (name of the database)
 ```
+Note that to run using the deployed server you need only configure 'PORT' all other values must remain unchanged.
 
 5. Run the application:
 
