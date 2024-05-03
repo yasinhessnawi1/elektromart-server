@@ -42,7 +42,8 @@ func main() {
 	r.Use(LoggerMiddleware())
 	r.Use(cors.New(corsConfig))
 	setupRoutes(r, db)
-	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db) })
+	jwtService := &tools.JWTTokenService{}
+	r.POST("/login", func(context *gin.Context) { handlers.PostLogin(context, db, jwtService) })
 	r.GET("/protected", tools.TokenAuthMiddleware(), func(c *gin.Context) {
 		username := c.MustGet("username").(string)
 		user, err := handlers.GetUserByUN(username, db)
@@ -106,8 +107,8 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.PUT("/products/:id", func(c *gin.Context) { handlers.UpdateProduct(c, db) })
 	router.DELETE("/products/:id", func(c *gin.Context) { handlers.DeleteProduct(c, db) })
 	// Here you should use Query Param Like :search-products/?name={The name of product}  or search-users/?price={The price}
-	//`or by brand id , category id`.
-	router.GET("/search-products/:any", func(c *gin.Context) { handlers.SearchAllProducts(c, db) })
+	//`or by brand_name , category_name`.
+	router.GET("/search-products/", func(c *gin.Context) { handlers.SearchAllProducts(c, db) })
 
 	router.GET("/brand", func(c *gin.Context) { handlers.GetBrands(c, db) })
 	router.GET("/brand/:id", func(c *gin.Context) { handlers.GetBrand(c, db) })

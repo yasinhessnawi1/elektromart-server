@@ -38,33 +38,22 @@ func GetProducts(c *gin.Context, db *gorm.DB) {
 // SearchAllProducts performs a search on products based on provided query parameters.
 // It constructs a search query dynamically and returns the matching products or an appropriate error message.
 func SearchAllProducts(c *gin.Context, db *gorm.DB) {
-	queryParam := c.Param("any") // Get the query parameter named 'any'
+	searchParams := map[string]interface{}{}
 
-	// Check if the query parameter is empty
-	if queryParam == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter 'any' is required"})
-		return
-	}
-
-	queryParam = strings.TrimSpace(queryParam) // Clean the input
-	searchParams := make(map[string]interface{})
-
-	// Define the fields to search in
-	searchFields := []string{"name", "description", "price", "stock_quantity", "brand_id", "category_id"}
-
-	// Populate the searchParams map with the same queryParam for all specified fields
-	for _, field := range searchFields {
-		switch field {
-		case "price", "stock_quantity", "brand_id", "category_id":
-			if numVal, err := strconv.ParseFloat(queryParam, 64); err == nil {
-				searchParams[field] = numVal // Use as a number if conversion is successful
-			} // If conversion fails, do not add to map - optional: handle this as needed
-		default:
-			searchParams[field] = queryParam // Use as a string
+	for _, field := range []string{"name", "description", "price", "stock_quantity", "brand_name", "category_name"} {
+		if value := c.Query(field); value != "" {
+			cleanValue := strings.TrimSpace(value)
+			if field == "price" || field == "stock_quantity" {
+				if numVal, err := strconv.ParseFloat(cleanValue, 64); err == nil {
+					searchParams[field] = numVal
+				}
+			} else {
+				searchParams[field] = cleanValue
+			}
 		}
 	}
 
-	// Search for products with the populated parameters
+	// Search for products based on the search parameters
 	products, err := models.SearchProduct(db, searchParams)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products", "details": err.Error()})
@@ -72,7 +61,7 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(products) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No product found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No products found"})
 		return
 	}
 

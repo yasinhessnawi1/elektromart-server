@@ -1,204 +1,342 @@
 package handlers
 
-/*
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+
+	"E-Commerce_Website_Database/internal/models"
 )
 
-var router = SetupRoutes()
-
-func SetupRoutes() *gin.Engine {
-	dsn := "root:@tcp(localhost:8000)/eCommerce?charset=utf8mb4&parseTime=True&loc=Local"
-	db, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	// Create a new router
+// setupRouterAndDB sets up the router and database in memory, and returns a function to clean up the database after the tests.
+func setupRouterAndDB(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
+	gin.SetMode(gin.TestMode)
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "Welcome to ElectroMart API"})
-	})
-	router.HandleMethodNotAllowed = true
 
-	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint not found or method not allowed"})
-	})
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("failed to open database: %v", err)
+	}
 
-	router.NoMethod(func(c *gin.Context) {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
-	})
+	if err := db.AutoMigrate(&models.Brands{}); err != nil {
+		t.Fatalf("failed to migrate database: %v", err)
+	}
 
-	// Setup routes in /cmd/main.go or wherever you configure routes
-	router.GET("/users", func(c *gin.Context) { GetUsers(c, db) })
-	router.GET("/users/:id", func(c *gin.Context) { GetUser(c, db) })
-	router.POST("/users", func(c *gin.Context) { CreateUser(c, db) })
-	router.PUT("/users/:id", func(c *gin.Context) { UpdateUser(c, db) })
-	router.DELETE("/users/:id", func(c *gin.Context) { DeleteUser(c, db) })
-	// Here you should use Query Param Like :search-users/?username={The username}  or search-users/?email={The email}
-	//`or by first name , last name , or address`.
-	router.GET("/search-users/", func(c *gin.Context) { SearchAllUsers(c, db) })
-
-	router.GET("/products", func(c *gin.Context) { GetProducts(c, db) })
-	router.GET("/products/:id", func(c *gin.Context) { GetProduct(c, db) })
-	router.POST("/products", func(c *gin.Context) { CreateProduct(c, db) })
-	router.PUT("/products/:id", func(c *gin.Context) { UpdateProduct(c, db) })
-	router.DELETE("/products/:id", func(c *gin.Context) { DeleteProduct(c, db) })
-	// Here you should use Query Param Like :search-products/?name={The name of product}  or search-users/?price={The price}
-	//`or by brand id , category id`.
-	router.GET("/search-products/", func(c *gin.Context) { SearchAllProducts(c, db) })
-
-	router.GET("/brand", func(c *gin.Context) { GetBrands(c, db) })
-	router.GET("/brand/:id", func(c *gin.Context) { GetBrand(c, db) })
-	router.POST("/brand", func(c *gin.Context) { CreateBrand(c, db) })
-	router.PUT("/brand/:id", func(c *gin.Context) { UpdateBrand(c, db) })
-	router.DELETE("/brand/:id", func(c *gin.Context) { DeleteBrand(c, db) })
-
-	router.GET("/categories", func(c *gin.Context) { GetCategories(c, db) })
-	router.GET("/categories/:id", func(c *gin.Context) { GetCategory(c, db) })
-	router.POST("/categories", func(c *gin.Context) { CreateCategory(c, db) })
-	router.PUT("/categories/:id", func(c *gin.Context) { UpdateCategory(c, db) })
-	router.DELETE("/categories/:id", func(c *gin.Context) { DeleteCategory(c, db) })
-
-	router.GET("/orders", func(c *gin.Context) { GetOrders(c, db) })
-	router.GET("/orders/:id", func(c *gin.Context) { GetOrder(c, db) })
-	router.POST("/orders", func(c *gin.Context) { CreateOrder(c, db) })
-	router.PUT("/orders/:id", func(c *gin.Context) { UpdateOrder(c, db) })
-	router.DELETE("/orders/:id", func(c *gin.Context) { DeleteOrder(c, db) })
-
-	router.GET("/orderItems", func(c *gin.Context) { GetOrderItems(c, db) })
-	router.GET("/orderItems/:id", func(c *gin.Context) { GetOrderItem(c, db) })
-	router.POST("/orderItems", func(c *gin.Context) { CreateOrderItem(c, db) })
-	router.PUT("/orderItems/:id", func(c *gin.Context) { UpdateOrderItem(c, db) })
-	router.DELETE("/orderItems/:id", func(c *gin.Context) { DeleteOrderItem(c, db) })
-
-	router.GET("/payments", func(c *gin.Context) { GetPayments(c, db) })
-	router.GET("/payments/:id", func(c *gin.Context) { GetPayment(c, db) })
-	router.POST("/payments", func(c *gin.Context) { CreatePayment(c, db) })
-	router.PUT("/payments/:id", func(c *gin.Context) { UpdatePayment(c, db) })
-	router.DELETE("/payments/:id", func(c *gin.Context) { DeletePayment(c, db) })
-	return router
+	// Function to clean up the database after tests finish
+	teardown := func() {
+		if err := db.Migrator().DropTable(&models.Brands{}); err != nil {
+			t.Fatalf("failed to drop table: %v", err)
+		}
+	}
+	return router, db, teardown
 }
 
-func TestGetBrandWithGin(t *testing.T) {
-	t.Run("Test GetBrand with valid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/1524773729", nil)
-		router.ServeHTTP(w, req)
+// TestGetBrandIntegration checks at this function return the correct records by given ID
+func TestGetBrandIntegration(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
-		}
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Test Brand", Description: "Test Description"})
+
+	router.GET("/brands/:id", func(c *gin.Context) {
+		GetBrand(c, db)
 	})
 
-	t.Run("Test GetBrand with invalid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/148683", nil)
-		router.ServeHTTP(w, req)
+	req, _ := http.NewRequest("GET", "/brands/1", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
 
-		if w.Code != http.StatusNotFound {
-			t.Errorf("Expected HTTP status 404 with an error, got %d", w.Code)
-		}
-	})
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	assert.Equal(t, float64(1), response["ID"])
+	assert.Equal(t, "Test Brand", response["name"])
+	assert.Equal(t, "Test Description", response["description"])
+
+	// Check the status code
+	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func TestGetBrandsWithGin(t *testing.T) {
+// TestGetBrandIntegrationInvalid checks at this function return the correct error.
+func TestGetBrandIntegrationInvalid(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
 
-	t.Run("Test GetBrands with valid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/1524773729", nil)
-		router.ServeHTTP(w, req)
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Test Brand", Description: "Test Description"})
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
+	router.GET("/brands/:id", func(c *gin.Context) {
+		GetBrand(c, db)
 	})
 
-	t.Run("Test GetBrands with invalid ID", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/brand/148683", nil)
-		router.ServeHTTP(w, req)
+	req, _ := http.NewRequest("GET", "/brands/2", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
 
-		if w.Code != http.StatusNotFound {
-			t.Errorf("Expected HTTP status 404 with an error, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
 
-	})
+	// Check the status code
+	assert.Equal(t, http.StatusNotFound, rr.Code)
+	assert.Contains(t, response["error"], "Brand not found")
 }
 
-func TestCreateBrand(t *testing.T) {
-	t.Run("Test CreateBrand with valid data", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		// Replace nil with the correct data
-		body := map[string]interface{}{
-			"name":        "Test Brand",
-			"description": "This is a test brand",
-		}
-		correctData, _ := json.Marshal(body)
-		req, _ := http.NewRequest("POST", "/brand", bytes.NewBuffer(correctData))
-		router.ServeHTTP(w, req)
-		if w.Code != http.StatusCreated {
-			t.Errorf("Expected HTTP status 201 Created, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
+// TestGetBrandsIntegration checks if the GetBrands function returns all brands from the database.
+func TestGetBrandsIntegration(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Brand 1", Description: "Description 1"})
+	db.Create(&models.Brands{Model: gorm.Model{ID: 2}, Name: "Brand 2", Description: "Description 2"})
+
+	router.GET("/brands", func(c *gin.Context) {
+		GetBrands(c, db)
 	})
 
-	t.Run("Test CreateBrand with invalid data", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		body := map[string]interface{}{
-			"test": "test",
-		}
-		incorrectData, _ := json.Marshal(body)
-		req, _ := http.NewRequest("POST", "/brand", bytes.NewBuffer(incorrectData))
-		router.ServeHTTP(w, req)
+	req, _ := http.NewRequest("GET", "/brands", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
 
-		if w.Code != http.StatusBadRequest {
-			t.Errorf("Expected HTTP status 500 Internal Server Error, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
-	})
+	var response []models.Brands
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check if all brands are retrieved
+	assert.Equal(t, 2, len(response))
+	assert.Equal(t, "Brand 1", response[0].Name)
+	assert.Equal(t, "Description 1", response[0].Description)
+	assert.Equal(t, "Brand 2", response[1].Name)
+	assert.Equal(t, "Description 2", response[1].Description)
+
+	// Check the status code
+	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func TestUpdateBrand(t *testing.T) {
-	t.Run("Test UpdateBrand with valid data", func(t *testing.T) {
-		w := httptest.NewRecorder()
+// TestSearchAllBrandsIntegration checks if the SearchAllBrands function returns brands based on search parameters.
+func TestSearchAllBrandsIntegration(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
 
-		Body := map[string]interface{}{
-			"name":        "Test Brand",
-			"description": "This is a test brand",
-		}
-		bodyData, _ := json.Marshal(Body)
-		req, _ := http.NewRequest("PUT", "/brand/1524773729", bytes.NewBuffer(bodyData))
-		router.ServeHTTP(w, req)
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Brand 1", Description: "Description 1"})
+	db.Create(&models.Brands{Model: gorm.Model{ID: 2}, Name: "Brand 2", Description: "Description 2"})
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected HTTP status 200 OK, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
+	router.GET("/brands/search", func(c *gin.Context) {
+		SearchAllBrands(c, db)
 	})
 
-	t.Run("Test UpdateBrand with invalid data", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("PUT", "/brand/148683", nil)
-		router.ServeHTTP(w, req)
+	req, _ := http.NewRequest("GET", "/brands/search?name=Brand 1", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
 
-		if w.Code != http.StatusBadRequest {
-			t.Errorf("Expected HTTP status 500 Internal Server Error, got %d", w.Code)
-		} else {
-			t.Log("Test passed")
-		}
-	})
+	var response []models.Brands
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check if the correct brand is retrieved
+	assert.Equal(t, 1, len(response))
+	assert.Equal(t, "Brand 1", response[0].Name)
+	assert.Equal(t, "Description 1", response[0].Description)
+
+	// Check the status code
+	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-*/
+// TestSearchAllBrandsIntegrationEmpty checks if the SearchAllBrands function returns a message when no brands match the search criteria.
+func TestSearchAllBrandsIntegrationEmpty(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Brand 1", Description: "Description 1"})
+
+	router.GET("/brands/search", func(c *gin.Context) {
+		SearchAllBrands(c, db)
+	})
+
+	req, _ := http.NewRequest("GET", "/brands/search?name=Brand 2", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check if the response contains the appropriate message
+	assert.Equal(t, "No brands found", response["error"])
+
+	// Check the status code
+	assert.Equal(t, http.StatusNotFound, rr.Code)
+}
+
+// TestCreateBrand_Success ensures that a brand can be successfully created with valid data.
+func TestCreateBrand_Success(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	router.POST("/brands", func(c *gin.Context) {
+		CreateBrand(c, db)
+	})
+
+	newBrand := `{"name":"Valid Brand", "description":"Valid Description"}`
+	req, _ := http.NewRequest("POST", "/brands", bytes.NewBufferString(newBrand))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusCreated, rr.Code)
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check response body is correct
+	assert.Equal(t, "Valid Brand", response["name"])
+	assert.Equal(t, "Valid Description", response["description"])
+}
+
+// TestCreateBrand_InvalidData checks the response when incomplete or incorrect data is sent.
+func TestCreateBrand_InvalidData(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	router.POST("/brands", func(c *gin.Context) {
+		CreateBrand(c, db)
+	})
+
+	newBrand := `{"name":""}`
+	req, _ := http.NewRequest("POST", "/brands", bytes.NewBufferString(newBrand))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check response body
+	assert.Contains(t, response["error"], "Validation error")
+}
+
+// TestUpdateBrandValid Checks the ability to update an existing brand
+func TestUpdateBrandValid(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Old Brand", Description: "Old Description"})
+
+	// Set up the PUT route
+	router.PUT("/brands/:id", func(c *gin.Context) {
+		UpdateBrand(c, db)
+	})
+
+	// Update brand via HTTP PUT
+	updatedBrand := `{"name":"Updated Brand", "description":"Updated Description"}`
+	req, _ := http.NewRequest("PUT", "/brands/1", strings.NewReader(updatedBrand))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check that the response contains the updated data
+	assert.Equal(t, "Updated Brand", response["name"])
+	assert.Equal(t, "Updated Description", response["description"])
+}
+
+// TestUpdateBrandInvalid Checks the error message with invalid data.
+func TestUpdateBrandInvalid(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Old Brand", Description: "Old Description"})
+
+	// Set up the PUT route
+	router.PUT("/brands/:id", func(c *gin.Context) {
+		UpdateBrand(c, db)
+	})
+
+	// Update brand via HTTP PUT
+	updatedBrand := `{"name":"", "description":""}`
+	req, _ := http.NewRequest("PUT", "/brands/1", strings.NewReader(updatedBrand))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// check that the response contains the correct error message
+	assert.Contains(t, response["error"], "Validation error")
+
+}
+
+// TestDeleteBrandValid checks that a brand is deleted from the database
+func TestDeleteBrandValid(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Brand to Delete", Description: "Description"})
+
+	// Set up the DELETE route
+	router.DELETE("/brands/:id", func(c *gin.Context) {
+		DeleteBrand(c, db)
+	})
+
+	// Delete brand via HTTP DELETE
+	req, _ := http.NewRequest("DELETE", "/brands/1", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	// Check the status code is correct
+	assert.Equal(t, http.StatusNoContent, rr.Code)
+}
+
+// TestDeleteBrandInvalid checks the delete brand with invalid ID
+func TestDeleteBrandInvalid(t *testing.T) {
+	router, db, teardown := setupRouterAndDB(t)
+	defer teardown()
+
+	db.Create(&models.Brands{Model: gorm.Model{ID: 1}, Name: "Brand to Delete", Description: "Description"})
+
+	// Set up the DELETE route
+	router.DELETE("/brands/:id", func(c *gin.Context) {
+		DeleteBrand(c, db)
+	})
+
+	// Delete brand via HTTP DELETE
+	req, _ := http.NewRequest("DELETE", "/brands/2", nil)
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusNotFound, rr.Code)
+	var response map[string]interface{}
+	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	// Check if the response contains the error message
+	assert.Contains(t, response["error"], "Brands not found")
+}

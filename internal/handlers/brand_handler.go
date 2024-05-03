@@ -54,6 +54,7 @@ func SearchAllBrands(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, brands)
 }
 
