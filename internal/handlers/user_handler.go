@@ -127,10 +127,23 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found during update"})
 		return
 	}
+	if newUser.Password != "" {
+		if tools.CheckPassword(newUser.Password) {
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password", "details": err.Error()})
+				return
+			}
+			user.Password = string(hashedPassword)
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Password is not valid, must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character"})
+			return
+
+		}
+	}
 
 	// Update user fields
 	user.Username = newUser.Username
-	user.Password = newUser.Password
 	user.Email = newUser.Email
 	user.First_Name = newUser.First_Name
 	user.Last_Name = newUser.Last_Name
