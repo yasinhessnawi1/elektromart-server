@@ -51,7 +51,7 @@ func SearchAllBrands(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	if !tools.CheckString(brands.Name, 250) && !tools.CheckString(brands.Description, 1000) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No category found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No brand found"})
 		return
 	}
 

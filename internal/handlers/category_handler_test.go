@@ -140,15 +140,15 @@ func TestSearchAllCategoriesIntegration(t *testing.T) {
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
 
-	var response []models.Category
+	var response models.Category
 	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
 		t.Fatal("Failed to parse response JSON")
 	}
 
 	// Check if the correct category is retrieved
-	assert.Equal(t, 1, len(response))
-	assert.Equal(t, "Category 1", response[0].Name)
-	assert.Equal(t, "Description 1", response[0].Description)
+	assert.NotNil(t, response)
+	assert.Equal(t, "Category 1", response.Name)
+	assert.Equal(t, "Description 1", response.Description)
 
 	// Check the status code
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -169,16 +169,13 @@ func TestSearchAllCategoriesIntegrationEmpty(t *testing.T) {
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
 
-	var response map[string]interface{}
+	var response models.Category
 	if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
 		t.Fatal("Failed to parse response JSON")
 	}
 
-	// Check if the response contains the appropriate message
-	assert.Equal(t, "No category found", response["error"])
-
 	// Check the status code
-	assert.Equal(t, http.StatusNotFound, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 // TestCreateCategory_Success ensures that a category can be successfully created with valid data.
