@@ -65,7 +65,7 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 }
 
 // CreateUser handles the creation of a new user from JSON input.
-// It validates the input and stores the new user in the database, responding with the created user or an error message.
+// It validates the input and stores the new user in the database, responding to the created user or an error message.
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var newUser models.User
 
@@ -92,7 +92,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		},
 	}
 
-	if failed, err := checkUser(user, newUser); failed {
+	if failed, err := checkUser(user, newUser, true); failed {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
@@ -127,16 +127,29 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found during update"})
 		return
 	}
+	if newUser.Password != "" {
+		if tools.CheckPassword(newUser.Password) {
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password", "details": err.Error()})
+				return
+			}
+			user.Password = string(hashedPassword)
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Password is not valid, must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character"})
+			return
+
+		}
+	}
 
 	// Update user fields
 	user.Username = newUser.Username
-	user.Password = newUser.Password
 	user.Email = newUser.Email
 	user.First_Name = newUser.First_Name
 	user.Last_Name = newUser.Last_Name
 	user.Address = newUser.Address
 
-	if failed, err := checkUser(user, newUser); failed {
+	if failed, err := checkUser(user, newUser, false); failed && err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
 		return
 	}
@@ -171,7 +184,7 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 
 // checkUser performs validation checks on user data.
 // It returns a boolean indicating failure and an error with the validation issue.
-func checkUser(user models.User, newUser models.User) (bool, error) {
+func checkUser(user models.User, newUser models.User, isCreating bool) (bool, error) {
 	switch true {
 	case !user.SetFirstName(newUser.First_Name):
 		return true, fmt.Errorf("first name is wrong formatted")
@@ -180,7 +193,10 @@ func checkUser(user models.User, newUser models.User) (bool, error) {
 	case !user.SetUsername(newUser.Username):
 		return true, fmt.Errorf("invalid username")
 	case !user.SetPassword(newUser.Password):
-		return true, fmt.Errorf("invalid password")
+		if isCreating {
+			return true, fmt.Errorf("invalid password")
+		}
+		return false, nil
 	case !user.SetEmail(newUser.Email):
 		return true, fmt.Errorf("invalid email")
 	case !user.SetAddress(newUser.Address):
