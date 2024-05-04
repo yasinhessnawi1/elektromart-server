@@ -86,6 +86,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		First_Name: newUser.First_Name,
 		Last_Name:  newUser.Last_Name,
 		Address:    newUser.Address,
+		Mobile:     newUser.Mobile,
 		Role:       "regular",
 		Model: gorm.Model{
 			ID: uint(tools.GenerateUUID()),
@@ -148,6 +149,7 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 	user.First_Name = newUser.First_Name
 	user.Last_Name = newUser.Last_Name
 	user.Address = newUser.Address
+	user.Mobile = newUser.Mobile
 
 	if failed, err := checkUser(user, newUser, false); failed && err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error", "details": err.Error()})
@@ -201,6 +203,8 @@ func checkUser(user models.User, newUser models.User, isCreating bool) (bool, er
 		return true, fmt.Errorf("invalid email")
 	case !user.SetAddress(newUser.Address):
 		return true, fmt.Errorf("invalid address")
+	case !user.SetPhone(newUser.Mobile):
+		return true, fmt.Errorf("invalid mobile")
 	}
 	return false, nil
 }

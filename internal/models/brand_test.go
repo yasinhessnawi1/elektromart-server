@@ -99,7 +99,7 @@ func TestSearchBrand(t *testing.T) {
 	brands, err := SearchBrand(gormDB, map[string]interface{}{"name": "Search Brand"})
 	assert.NoError(t, err)
 	assert.Len(t, brands, 1)
-	assert.Equal(t, "Search Brand", brands[0].Name)
+	assert.Equal(t, "Search Brand", brands.Name)
 
 	// Check all expectations
 	assert.NoError(t, mock.ExpectationsWereMet())

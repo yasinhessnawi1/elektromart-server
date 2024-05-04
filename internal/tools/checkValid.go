@@ -2,6 +2,7 @@ package tools
 
 import (
 	"strings"
+	"unicode"
 )
 
 // CheckString validates the length of a string, ensuring it is not empty and does not exceed the specified maxLength.
@@ -113,4 +114,16 @@ func CheckRole(role string) bool {
 		}
 	}
 	return false
+}
+
+func CheckPhone(phone string, i int) bool {
+	if len(phone) > i {
+		return false
+	}
+	for _, char := range phone {
+		if !unicode.IsDigit(char) {
+			return false
+		}
+	}
+	return true
 }
