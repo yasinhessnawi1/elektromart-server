@@ -15,6 +15,7 @@ type User struct {
 	First_Name string `json:"first_name"`
 	Last_Name  string `json:"last_name"`
 	Address    string `json:"address"`
+	Mobile     string `json:"mobile"`
 	Role       string `json:"role"`
 }
 
@@ -45,6 +46,17 @@ func (u *User) SetUsername(username string) bool {
 		return false
 	} else {
 		u.Username = username
+		return true
+	}
+}
+
+// SetUsername sets the username for the user after validating its uniqueness and length.
+// Returns true if the username is within the allowed length and unique, otherwise false.
+func (u *User) SetPhone(phone string) bool {
+	if !tools.CheckPhone(phone, 11) {
+		return false
+	} else {
+		u.Mobile = phone
 		return true
 	}
 }
