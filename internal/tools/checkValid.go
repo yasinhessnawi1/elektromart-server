@@ -106,6 +106,8 @@ func CheckPaymentMethod(method string) bool {
 	return false
 }
 
+// CheckRole validates if a role is one of the predefined valid roles.
+// Returns true if the role is valid, otherwise false.
 func CheckRole(role string) bool {
 	validRoles := []string{"admin", "regular"}
 	for _, validRole := range validRoles {
@@ -116,6 +118,8 @@ func CheckRole(role string) bool {
 	return false
 }
 
+// CheckPhone validates a phone number by ensuring it contains only digits and does not exceed the specified length.
+// Returns true if the phone number is within the valid range and contains only digits, otherwise false.
 func CheckPhone(phone string, i int) bool {
 	if len(phone) > i {
 		return false

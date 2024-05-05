@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllCategories checks at this function returns all records correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllCategories(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -36,6 +39,9 @@ func TestGetAllCategories(t *testing.T) {
 }
 
 // TestCategory_SetName check if this function sets the name of category correctly
+// It creates a new instance of the Category struct and calls the SetName function with a valid name.
+// It then checks if the name was set correctly and if the function returned true.
+// It repeats the process with an invalid name and checks if the name was not set and the function returned false.
 func TestCategory_SetName(t *testing.T) {
 	c := Category{}
 	assert.True(t, c.SetName("Valid Category Name"))
@@ -45,6 +51,9 @@ func TestCategory_SetName(t *testing.T) {
 }
 
 // TestCategory_SetDescription check if this function sets the description of category correctly
+// It creates a new instance of the Category struct and calls the SetDescription function with a valid description.
+// It then checks if the description was set correctly and if the function returned true.
+// It repeats the process with an invalid description and checks if the description was not set and the function returned false.
 func TestCategory_SetDescription(t *testing.T) {
 	c := Category{}
 	assert.True(t, c.SetDescription("Valid Category Description"))
@@ -54,6 +63,8 @@ func TestCategory_SetDescription(t *testing.T) {
 }
 
 // TestCategoryExists checks at this function ensure at a specific category exists.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
 func TestCategoryExists(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -81,6 +92,8 @@ func TestCategoryExists(t *testing.T) {
 }
 
 // TestSearchCategory checks at this function returns all records correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
 func TestSearchCategory(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()

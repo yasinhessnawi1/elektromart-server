@@ -26,6 +26,9 @@ func GetAllOrders(db *gorm.DB) ([]Order, error) {
 	return orders, nil
 }
 
+// SetUserID validates and sets the user ID of an order.
+// It returns true if the user ID is valid and set successfully, otherwise returns false.
+// The order's user ID is updated if the check is successful.
 func (o *Order) SetUserID(user_id uint32, db *gorm.DB) bool {
 	if !UserExists(db, user_id) {
 		return false
@@ -76,6 +79,9 @@ func OrderExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchOrder performs a search for an order based on the provided search parameters.
+// It constructs a search query dynamically and returns the matching order or an error if not found.
+// If the search is successful, it responds with an HTTP 200 OK status and the order details in JSON format.
 func SearchOrder(db *gorm.DB, searchParams map[string]interface{}) ([]Order, error) {
 	var orders []Order
 	query := db.Model(&Order{})

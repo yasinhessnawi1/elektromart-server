@@ -17,6 +17,7 @@ type OrderItem struct {
 
 // GetAllOrderItems retrieves all order items from the database.
 // It returns a slice of OrderItem and an error if there is any issue during fetching.
+// If the fetch is successful, it returns the list of order items, otherwise an error message.
 func GetAllOrderItems(db *gorm.DB) ([]OrderItem, error) {
 	var orderItems []OrderItem
 	if err := db.Find(&orderItems).Error; err != nil {
@@ -27,6 +28,7 @@ func GetAllOrderItems(db *gorm.DB) ([]OrderItem, error) {
 
 // SetOrderID validates and sets the Order_ID for an order item, ensuring the order exists.
 // It returns true if the order exists and the ID is successfully set; otherwise, it returns false.
+// The order ID is validated by checking if the order exists in the database.
 func (oi *OrderItem) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	if !OrderExists(db, order_id) {
 		return false
@@ -38,6 +40,7 @@ func (oi *OrderItem) SetOrderID(order_id uint32, db *gorm.DB) bool {
 
 // SetProductID validates and sets the Product_ID for an order item, ensuring the product exists.
 // It returns true if the product exists and the ID is successfully set; otherwise, it returns false.
+// The product ID is validated by checking if the product exists in the database.
 func (oi *OrderItem) SetProductID(product_id uint32, db *gorm.DB) bool {
 	if !ProductExists(db, product_id) {
 		return false
@@ -49,6 +52,7 @@ func (oi *OrderItem) SetProductID(product_id uint32, db *gorm.DB) bool {
 
 // SetQuantity validates and sets the quantity of an order item.
 // It ensures the quantity is a positive integer before setting. Returns true if valid; otherwise false.
+// The quantity is set if it is a positive integer.
 func (oi *OrderItem) SetQuantity(quantity int) bool {
 	if !tools.CheckInt(quantity) {
 		return false
@@ -79,6 +83,10 @@ func OrderItemExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchOrderItem performs a search for an order item based on the provided search parameters.
+// It constructs a search query dynamically and returns the matching order item or an error if not found.
+// If the search is successful, it returns the order item.
+// If no order item is found, it responds with an HTTP 404 Not Found status.
 func SearchOrderItem(db *gorm.DB, searchParams map[string]interface{}) ([]OrderItem, error) {
 	var orderItems []OrderItem
 	query := db.Model(&OrderItem{})

@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDB sets up the router and database in memory, and returns a function to clean up the database after the tests.
+// It returns the router, database, and a teardown function.
 func setupRouterAndDB(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -38,7 +39,8 @@ func setupRouterAndDB(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	return router, db, teardown
 }
 
-// TestGetBrandIntegration checks at this function return the correct records by given ID
+// TestGetBrandIntegration checks at this function and return the correct records by the given ID.
+// It should return a status code of 200 and a JSON response with the brand details.
 func TestGetBrandIntegration(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -66,7 +68,10 @@ func TestGetBrandIntegration(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-// TestGetBrandIntegrationInvalid checks at this function return the correct error.
+// TestGetBrandIntegration checks at this function and return the correct records by the given ID.
+// It checks the response when the ID is invalid.
+// It should return an error message and a status code of 404.
+// The error message should indicate that the brand was not found.
 func TestGetBrandIntegrationInvalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -92,6 +97,8 @@ func TestGetBrandIntegrationInvalid(t *testing.T) {
 }
 
 // TestGetBrandsIntegration checks if the GetBrands function returns all brands from the database.
+// It should return a status code of 200 and a JSON response with all brands.
+// The response should contain the correct brand details.
 func TestGetBrandsIntegration(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -124,6 +131,8 @@ func TestGetBrandsIntegration(t *testing.T) {
 }
 
 // TestSearchAllBrandsIntegration checks if the SearchAllBrands function returns brands based on search parameters.
+// It should return a status code of 200 and a JSON response with the matching brands.
+// The response should contain the correct brand details.
 func TestSearchAllBrandsIntegration(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -153,7 +162,9 @@ func TestSearchAllBrandsIntegration(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-// TestSearchAllBrandsIntegrationEmpty checks if the SearchAllBrands function returns a message when no brands match the search criteria.
+// TestSearchAllBrandsIntegrationEmpty checks if the SearchAllBrands function returns
+// a message when no brands match the search criteria.
+// It should return a status code of 404 and a JSON response with an error message.
 func TestSearchAllBrandsIntegrationEmpty(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -181,6 +192,8 @@ func TestSearchAllBrandsIntegrationEmpty(t *testing.T) {
 }
 
 // TestCreateBrand_Success ensures that a brand can be successfully created with valid data.
+// It checks the response body and status code.
+// It should return a status code of 201 and a JSON response with the created brand details.
 func TestCreateBrand_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -208,6 +221,7 @@ func TestCreateBrand_Success(t *testing.T) {
 }
 
 // TestCreateBrand_InvalidData checks the response when incomplete or incorrect data is sent.
+// It should return an error message and a status code of 400.
 func TestCreateBrand_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -233,7 +247,11 @@ func TestCreateBrand_InvalidData(t *testing.T) {
 	assert.Contains(t, response["error"], "Validation error")
 }
 
-// TestUpdateBrandValid Checks the ability to update an existing brand
+// TestUpdateBrandValid Checks the ability to update an existing brand with valid data.
+// It should return a status code of 200 and a JSON response with the updated brand details.
+// The response should contain the correct brand details.
+// The brand should be updated in the database.
+// The response should contain the updated brand details.
 func TestUpdateBrandValid(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -264,6 +282,7 @@ func TestUpdateBrandValid(t *testing.T) {
 }
 
 // TestUpdateBrandInvalid Checks the error message with invalid data.
+// It should return an error message and a status code of 400.
 func TestUpdateBrandInvalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -288,7 +307,7 @@ func TestUpdateBrandInvalid(t *testing.T) {
 		t.Fatal("Failed to parse response JSON")
 	}
 
-	// check that the response contains the correct error message
+	// checks that the response contains the correct error message
 	assert.Contains(t, response["error"], "Validation error")
 
 }
@@ -314,7 +333,9 @@ func TestDeleteBrandValid(t *testing.T) {
 	assert.Equal(t, http.StatusNoContent, rr.Code)
 }
 
-// TestDeleteBrandInvalid checks the delete brand with invalid ID
+// TestDeleteBrandInvalid checks the delete brand with invalid ID and return an error message.
+// It should return an error message and a status code of 404.
+// The error message should indicate that the brand was not found.
 func TestDeleteBrandInvalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()

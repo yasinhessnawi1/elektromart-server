@@ -12,6 +12,7 @@ import (
 
 // GetBrand fetches a single brand based on the ID provided in the URL.
 // It returns the brand if found or appropriate error messages for missing ID or not found scenarios.
+// In case of an error, it sends an HTTP 500 Internal Server Error.
 func GetBrand(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var brand models.Brands
@@ -35,6 +36,9 @@ func GetBrands(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, brands)
 }
 
+// SearchAllBrands retrieves all brands from the database based on the search parameters provided in the query string.
+// It responds with a list of brands if successful or an informational message if no brands exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
 func SearchAllBrands(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -58,6 +62,11 @@ func SearchAllBrands(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, brands)
 }
 
+// CreateBrand adds a new brand to the database based on the JSON data provided in the request body.
+// It responds with the newly created brand or an error message if the data is invalid or creation fails.
+// The brand's name and description fields are validated for correct formatting.
+// If the brand is successfully created, it sends an HTTP 201 Created response.
+// In case of a validation error, it sends an HTTP 400 Bad Request response.
 func CreateBrand(c *gin.Context, db *gorm.DB) {
 	var newBrand models.Brands
 	if err := c.ShouldBindJSON(&newBrand); err != nil {
@@ -88,6 +97,9 @@ func CreateBrand(c *gin.Context, db *gorm.DB) {
 
 // UpdateBrand modifies an existing brand based on the ID provided in the URL.
 // It updates the brand's name and description with the provided data and responds accordingly.
+// If the brand is not found, it sends an HTTP 404 Not Found response.
+// If the update is successful, it sends an HTTP 200 OK response with the updated brand.
+// If the update fails, it sends an HTTP 500 Internal Server Error.
 func UpdateBrand(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -144,6 +156,8 @@ func DeleteBrand(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkBrand validates the input data for a brand and returns an error if the data is invalid.
+// It checks the brand's name and description fields for correct formatting.
 func checkBrand(brand models.Brands, newBrand models.Brands) (bool, error) {
 	switch true {
 	case !brand.SetName(newBrand.Name):

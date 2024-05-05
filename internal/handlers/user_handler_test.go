@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDBUser sets up the router and the database for testing user-related endpoints.
+// It returns the router, the database, and a function to clean up the database after tests finish.
 func setupRouterAndDBUser(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +40,9 @@ func setupRouterAndDBUser(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 }
 
 // TestGetUser_Success tests successful retrieval of a user by ID.
+// It creates a user, sends a GET request to retrieve the user, and checks the response.
+// If the user is found, it responds with an HTTP 200 OK status and the user details in JSON format.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
 func TestGetUser_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -64,6 +68,9 @@ func TestGetUser_Success(t *testing.T) {
 }
 
 // TestGetUser_NotFound tests retrieval failure when a user does not exist.
+// It sends a GET request to retrieve a non-existing user and checks the response.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
+// If the user is found, it responds with an HTTP 200 OK status and the user details in JSON format.
 func TestGetUser_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -80,6 +87,9 @@ func TestGetUser_NotFound(t *testing.T) {
 }
 
 // TestGetUsers_Success tests retrieval of all users.
+// It creates multiple users, sends a GET request to retrieve all users, and checks the response.
+// If users are found, it responds with an HTTP 200 OK status and the user details in JSON format.
+// If no users are found, it responds with an HTTP 200 OK status and an empty JSON array.
 func TestGetUsers_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -110,6 +120,9 @@ func TestGetUsers_Success(t *testing.T) {
 }
 
 // TestGetUsers_Empty tests the scenario where no users exist.
+// It sends a GET request to retrieve all users and checks the response.
+// If no users are found, it responds with an HTTP 200 OK status and an empty JSON array.
+// If users are found, it responds with an HTTP 200 OK status and the user details in JSON format.
 func TestGetUsers_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -132,6 +145,9 @@ func TestGetUsers_Empty(t *testing.T) {
 }
 
 // TestSearchAllUsers_Success tests successful searching of users based on specific criteria.
+// It creates a user, sends a GET request with search criteria to retrieve the user, and checks the response.
+// If the search is successful, it responds with an HTTP 200 OK status and the user details in JSON format.
+// If no users are found, it responds with an HTTP 404 Not Found status.
 func TestSearchAllUsers_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -158,6 +174,9 @@ func TestSearchAllUsers_Success(t *testing.T) {
 }
 
 // TestSearchAllUsers_Empty tests the scenario where a search query matches no existing users.
+// It sends a GET request with search criteria to retrieve a non-existing user and checks the response.
+// If no users are found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the user details in JSON format.
 func TestSearchAllUsers_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -174,6 +193,9 @@ func TestSearchAllUsers_Empty(t *testing.T) {
 }
 
 // TestCreateUser_Success tests successful creation of a new user.
+// It sends a POST request with user details to create a new user and checks the response.
+// If the user is created successfully, it responds with an HTTP 201 Created status and the user details in JSON format.
+// If the JSON data is invalid, it responds with an HTTP 400 Bad Request status.
 func TestCreateUser_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -198,6 +220,9 @@ func TestCreateUser_Success(t *testing.T) {
 }
 
 // TestCreateUser_InvalidData tests creation of a user with invalid data.
+// It sends a POST request with invalid user details to create a new user and checks the response.
+// If the JSON data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the user is created successfully, it responds with an HTTP 201 Created status and the user details in JSON format.
 func TestCreateUser_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -216,6 +241,9 @@ func TestCreateUser_InvalidData(t *testing.T) {
 }
 
 // TestUpdateUser_Success tests successful updating of an existing user.
+// It creates a user, sends a PUT request with updated user details, and checks the response.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated user details in JSON format.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
 func TestUpdateUser_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -243,6 +271,9 @@ func TestUpdateUser_Success(t *testing.T) {
 }
 
 // TestUpdateUser_NotFound tests updating a non-existing user.
+// It sends a PUT request with updated user details to update a non-existing user and checks the response.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated user details in JSON format.
 func TestUpdateUser_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -261,6 +292,9 @@ func TestUpdateUser_NotFound(t *testing.T) {
 }
 
 // TestDeleteUser_Valid tests the successful deletion of an existing user.
+// It creates a user, sends a DELETE request to delete the user, and checks the response.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
+// If the user does not exist, it responds with an HTTP 404 Not Found status.
 func TestDeleteUser_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()
@@ -280,6 +314,9 @@ func TestDeleteUser_Valid(t *testing.T) {
 }
 
 // TestDeleteUser_Invalid tests attempting to delete a non-existing user.
+// It sends a DELETE request to delete a non-existing user and checks the response.
+// If the user does not exist, it responds with an HTTP 404 Not Found status.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
 func TestDeleteUser_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBUser(t)
 	defer teardown()

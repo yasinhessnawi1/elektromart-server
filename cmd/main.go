@@ -16,6 +16,8 @@ import (
 )
 
 // main initializes the application, sets up database connections, and starts the HTTP server.
+// It loads the configuration settings, sets up the database connection, and initializes the Gin router.
+// It then sets up the routes and starts the server on the specified port.
 func main() {
 	config.LoadConfig()
 	port := config.GetConfig("PORT")
@@ -154,6 +156,8 @@ func setupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/search-payments/", func(c *gin.Context) { handlers.SearchAllPayments(c, db) })
 }
 
+// LoggerMiddleware is a middleware function that logs the request headers.
+// It logs the headers before and after the request is processed.
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("Request received")

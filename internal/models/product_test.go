@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllProducts tests that all products are retrieved from the database correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllProducts(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -28,6 +31,9 @@ func TestGetAllProducts(t *testing.T) {
 }
 
 // TestProduct_SetName tests setting a product's name after validating its length.
+// It creates a new instance of the Product struct and calls the SetName function with a valid name.
+// It then checks if the name was set correctly and if the function returned true.
+// It repeats the process with an invalid name and checks if the name was not set and the function returned false.
 func TestProduct_SetName(t *testing.T) {
 	product := Product{}
 	assert.False(t, product.SetName(string(make([]byte, 256))), "Name should be invalid due to length")
@@ -35,6 +41,9 @@ func TestProduct_SetName(t *testing.T) {
 }
 
 // TestProduct_SetDescription tests setting a product's description after validating its length.
+// It creates a new instance of the Product struct and calls the SetDescription function with a valid description.
+// It then checks if the description was set correctly and if the function returned true.
+// It repeats the process with an invalid description and checks if the description was not set and the function returned false.
 func TestProduct_SetDescription(t *testing.T) {
 	product := Product{}
 	assert.False(t, product.SetDescription(string(make([]byte, 1001))), "Description should be invalid due to length")
@@ -42,6 +51,9 @@ func TestProduct_SetDescription(t *testing.T) {
 }
 
 // TestProduct_SetPrice tests setting a product's price after validating it as a positive float.
+// It creates a new instance of the Product struct and calls the SetPrice function with a valid price.
+// It then checks if the price was set correctly and if the function returned true.
+// It repeats the process with an invalid price and checks if the price was not set and the function returned false.
 func TestProduct_SetPrice(t *testing.T) {
 	product := Product{}
 	assert.False(t, product.SetPrice(-10.0), "Price should be invalid because it is negative")
@@ -49,6 +61,9 @@ func TestProduct_SetPrice(t *testing.T) {
 }
 
 // TestProduct_SetStockQuantity tests setting a product's stock quantity after validating it as a non-negative integer.
+// It creates a new instance of the Product struct and calls the SetStockQuantity function with a valid quantity.
+// It then checks if the quantity was set correctly and if the function returned true.
+// It repeats the process with an invalid quantity and checks if the quantity was not set and the function returned false.
 func TestProduct_SetStockQuantity(t *testing.T) {
 	product := Product{}
 	assert.False(t, product.SetStockQuantity(-1), "Stock quantity should be invalid because it is negative")
@@ -56,6 +71,9 @@ func TestProduct_SetStockQuantity(t *testing.T) {
 }
 
 // TestProduct_SetBrandID tests setting a product's brand ID after verifying the existence of the brand.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestProduct_SetBrandID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -77,6 +95,9 @@ func TestProduct_SetBrandID(t *testing.T) {
 }
 
 // TestProduct_SetCategoryID tests setting a product's category ID after verifying the existence of the category.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestProduct_SetCategoryID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -98,6 +119,9 @@ func TestProduct_SetCategoryID(t *testing.T) {
 }
 
 // TestProductExists tests checking if a specific product exists in the database by its ID.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestProductExists(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -116,6 +140,9 @@ func TestProductExists(t *testing.T) {
 }
 
 // TestSearchProduct tests the functionality to search for products based on provided parameters.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchProduct(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)

@@ -15,6 +15,9 @@ import (
 	"E-Commerce_Website_Database/internal/models"
 )
 
+// setupRouterAndDBProduct initializes a Gin engine and an in-memory SQLite database for testing.
+// It returns the Gin engine, the GORM database instance, and a teardown function to clean up after tests.
+// The database is configured with tables for Product, Brands, and Category models.
 func setupRouterAndDBProduct(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -37,6 +40,9 @@ func setupRouterAndDBProduct(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	return router, db, teardown
 }
 
+// TestGetProduct_Success tests the GetProduct handler with a valid product ID.
+// It creates a product in the database, sends a GET request to fetch the product, and checks the response.
+// The test passes if the response status code is 200 OK and the product details match the expected values.
 func TestGetProduct_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -61,6 +67,9 @@ func TestGetProduct_Success(t *testing.T) {
 	assert.Equal(t, product.Name, response.Name)
 }
 
+// TestGetProduct_NotFound tests the GetProduct handler with an invalid product ID.
+// It sends a GET request with a non-existent product ID and checks the response status code.
+// The test passes if the response status code is 404 Not Found.
 func TestGetProduct_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -76,6 +85,9 @@ func TestGetProduct_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, rr.Code)
 }
 
+// TestGetProducts_Success tests the GetProducts handler with multiple products in the database.
+// It creates two products in the database, sends a GET request to fetch all products, and checks the response.
+// The test passes if the response status code is 200 OK and the response contains the expected number of products.
 func TestGetProducts_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -100,6 +112,9 @@ func TestGetProducts_Success(t *testing.T) {
 	assert.Len(t, products, 2)
 }
 
+// TestGetProducts_Empty tests the GetProducts handler with an empty database.
+// It sends a GET request to fetch all products and checks the response.
+// The test passes if the response status code is 200 OK and the response contains an empty array.
 func TestGetProducts_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -121,6 +136,9 @@ func TestGetProducts_Empty(t *testing.T) {
 	assert.Empty(t, products)
 }
 
+// TestSearchProducts_Success tests the SearchAllProducts handler with products matching the search query.
+// It creates two products in the database, sends a GET request with a search query, and checks the response.
+// The test passes if the response status code is 200 OK and the response contains the expected number of products.
 func TestSearchProducts_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -153,6 +171,9 @@ func TestSearchProducts_Success(t *testing.T) {
 	assert.Len(t, response, 2) // Expecting two products to match "Hei"
 }
 
+// TestSearchProducts_Empty tests the SearchAllProducts handler with no products matching the search query.
+// It sends a GET request with a search query that should not match any products and checks the response.
+// The test passes if the response status code is 404 Not Found.
 func TestSearchProducts_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -169,6 +190,9 @@ func TestSearchProducts_Empty(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, rr.Code)
 }
 
+// TestCreateProduct_Success tests the CreateProduct handler with valid input data.
+// It sends a POST request with a valid product JSON, creates the product in the database, and checks the response.
+// The test passes if the response status code is 201 Created and the response contains the created product details.
 func TestCreateProduct_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -197,6 +221,9 @@ func TestCreateProduct_Success(t *testing.T) {
 	assert.Equal(t, "New Product", response.Name)
 }
 
+// TestCreateProduct_InvalidData tests the CreateProduct handler with invalid input data.
+// It sends a POST request with invalid product JSON, and checks the response status code.
+// The test passes if the response status code is 400 Bad Request.
 func TestCreateProduct_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -218,6 +245,9 @@ func TestCreateProduct_InvalidData(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
+// TestUpdateProduct_Success tests the UpdateProduct handler with valid input data.
+// It creates a product in the database, sends a PUT request to update the product, and checks the response.
+// The test passes if the response status code is 200 OK and the response contains the updated product details.
 func TestUpdateProduct_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -249,6 +279,9 @@ func TestUpdateProduct_Success(t *testing.T) {
 	assert.Equal(t, "Updated Product", response.Name)
 }
 
+// TestUpdateProduct_InvalidData tests the UpdateProduct handler with invalid input data.
+// It creates a product in the database, sends a PUT request with invalid product JSON, and checks the response.
+// The test passes if the response status code is 400 Bad Request.
 func TestUpdateProduct_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -266,6 +299,9 @@ func TestUpdateProduct_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, rr.Code)
 }
 
+// TestDeleteProduct_Valid tests the DeleteProduct handler with a valid product ID.
+// It creates a product in the database, sends a DELETE request to delete the product, and checks the response.
+// The test passes if the response status code is 204 No Content.
 func TestDeleteProduct_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
@@ -284,6 +320,9 @@ func TestDeleteProduct_Valid(t *testing.T) {
 	assert.Equal(t, http.StatusNoContent, rr.Code)
 }
 
+// TestDeleteProduct_Invalid tests the DeleteProduct handler with an invalid product ID.
+// It sends a DELETE request with a non-existent product ID and checks the response status code.
+// The test passes if the response status code is 404 Not Found.
 func TestDeleteProduct_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBProduct(t)
 	defer teardown()
