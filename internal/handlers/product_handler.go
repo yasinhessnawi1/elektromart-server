@@ -13,6 +13,8 @@ import (
 
 // GetProduct retrieves a single product by its ID.
 // It checks for the product's existence and validity of its data, then returns the product details or an error message.
+// If the product is not found, it responds with an HTTP 404 Not Found status.
+// If the product is found, it responds with an HTTP 200 OK status and the product details in JSON format.
 func GetProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var product models.Product
@@ -26,6 +28,8 @@ func GetProduct(c *gin.Context, db *gorm.DB) {
 
 // GetProducts retrieves all products from the database.
 // It returns a JSON response with a list of products or an error message if the retrieval fails.
+// If there are no products in the database, it responds with an HTTP 404 Not Found status.
+// If the retrieval is successful, it responds with an HTTP 200 OK status and the list of products in JSON format.
 func GetProducts(c *gin.Context, db *gorm.DB) {
 	products, err := models.GetAllProducts(db)
 	if err != nil {
@@ -37,6 +41,8 @@ func GetProducts(c *gin.Context, db *gorm.DB) {
 
 // SearchAllProducts performs a search on products based on provided query parameters.
 // It constructs a search query dynamically and returns the matching products or an appropriate error message.
+// If no products are found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the list of products in JSON format.
 func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -70,6 +76,8 @@ func SearchAllProducts(c *gin.Context, db *gorm.DB) {
 
 // CreateProduct handles the creation of a new product from JSON input.
 // It validates the input and stores the new product in the database, responding with the created product or an error message.
+// If the input data is invalid, it responds with an HTTP 400 Bad Request status and an error message.
+// If the product is created successfully, it responds with an HTTP 201 Created status and the product details in JSON format.
 func CreateProduct(c *gin.Context, db *gorm.DB) {
 	var newProduct models.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
@@ -104,6 +112,9 @@ func CreateProduct(c *gin.Context, db *gorm.DB) {
 
 // UpdateProduct handles the updating of an existing product.
 // It validates the provided input and updates the product in the database, responding with the updated product or an error message.
+// If the product does not exist, it responds with an HTTP 404 Not Found status.
+// If the input data is invalid, it responds with an HTTP 400 Bad Request status and an error message.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated product details in JSON format.
 func UpdateProduct(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -146,6 +157,8 @@ func UpdateProduct(c *gin.Context, db *gorm.DB) {
 
 // DeleteProduct handles the deletion of a product by its ID.
 // It validates the product's existence and removes it from the database, responding with an appropriate message.
+// If the product does not exist, it responds with an HTTP 404 Not Found status.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
 func DeleteProduct(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)

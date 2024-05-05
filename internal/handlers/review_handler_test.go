@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDBReview sets up the router and database for testing reviews, including migrating necessary models.
+// It returns the router, database, and a teardown function to drop the tables after testing.
 func setupRouterAndDBReview(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +40,8 @@ func setupRouterAndDBReview(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 }
 
 // TestGetReview_Success tests the successful retrieval of a review.
+// It creates a user, product, and review in the database, then fetches the review by its ID.
+// The test passes if the response status code is 200 and the review details match the expected values.
 func TestGetReview_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -68,6 +71,8 @@ func TestGetReview_Success(t *testing.T) {
 }
 
 // TestGetReview_NotFound tests the retrieval of a non-existing review.
+// It attempts to fetch a review with an invalid ID and expects a 404 Not Found response.
+// The test passes if the response status code is 404.
 func TestGetReview_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -84,6 +89,8 @@ func TestGetReview_NotFound(t *testing.T) {
 }
 
 // TestGetReviews_Success tests the successful retrieval of all reviews.
+// It creates two reviews in the database and fetches all reviews.
+// The test passes if the response status code is 200 and the number of reviews matches the expected count.
 func TestGetReviews_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -113,6 +120,9 @@ func TestGetReviews_Success(t *testing.T) {
 }
 
 // TestGetReviews_Empty tests retrieval of reviews when none exist.
+// The test passes if the response status code is 200 and the response body is an empty array.
+// This indicates that no reviews were found in the database.
+// The test passes if the response status code is 200 and the response body is an empty array.
 func TestGetReviews_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -135,6 +145,8 @@ func TestGetReviews_Empty(t *testing.T) {
 }
 
 // TestSearchAllReviews_Success tests successful searching of reviews.
+// It creates a user, product, and review in the database, then searches for reviews with a specific rating.
+// The test passes if the response status code is 200 and the number of reviews matches the expected count.
 func TestSearchAllReviews_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -164,6 +176,7 @@ func TestSearchAllReviews_Success(t *testing.T) {
 }
 
 // TestSearchAllReviews_Empty tests searching for reviews that do not match any existing data.
+// The test passes if the response status code is 404, indicating that no reviews were found.
 func TestSearchAllReviews_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -181,6 +194,8 @@ func TestSearchAllReviews_Empty(t *testing.T) {
 }
 
 // TestCreateReview_Success tests successful creation of a review.
+// It creates a user, product, and review in the database, then creates a new review.
+// The test passes if the response status code is 201 and the review details match the expected values.
 func TestCreateReview_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -210,6 +225,10 @@ func TestCreateReview_Success(t *testing.T) {
 }
 
 // TestCreateReview_InvalidData tests creation of a review with invalid data.
+// It attempts to create a review with an invalid rating and an empty comment.
+// The test passes if the response status code is 400, indicating that the input data was invalid.
+// The response body should contain an error message.
+// The test passes if the response status code is 400 and the response body contains an error message.
 func TestCreateReview_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -228,6 +247,8 @@ func TestCreateReview_InvalidData(t *testing.T) {
 }
 
 // TestUpdateReview_Success tests successful updating of a review.
+// It creates a user, product, and review in the database, then updates the review with new data.
+// The test passes if the response status code is 200 and the review details match the updated values.
 func TestUpdateReview_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -259,6 +280,8 @@ func TestUpdateReview_Success(t *testing.T) {
 }
 
 // TestUpdateReview_NotFound tests updating a non-existing review.
+// It attempts to update a review with an invalid ID and expects a 404 Not Found response.
+// The test passes if the response status code is 404.
 func TestUpdateReview_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -277,6 +300,8 @@ func TestUpdateReview_NotFound(t *testing.T) {
 }
 
 // TestDeleteReview_Valid tests the successful deletion of a review.
+// It creates a user, product, and review in the database, then deletes the review by its ID.
+// The test passes if the response status code is 204, indicating that the review was successfully deleted.
 func TestDeleteReview_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()
@@ -300,6 +325,8 @@ func TestDeleteReview_Valid(t *testing.T) {
 }
 
 // TestDeleteReview_Invalid tests attempting to delete a non-existing review.
+// It tries to delete a review with an invalid ID and expects a 404 Not Found response.
+// The test passes if the response status code is 404.
 func TestDeleteReview_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBReview(t)
 	defer teardown()

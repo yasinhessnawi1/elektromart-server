@@ -13,6 +13,8 @@ import (
 
 // GetUser retrieves a single user by ID from the URL parameters.
 // It returns the user details or an error message if the user is not found.
+// If the user is found, it responds with an HTTP 200 OK status and the user details in JSON format.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
 func GetUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var user models.User
@@ -27,6 +29,9 @@ func GetUser(c *gin.Context, db *gorm.DB) {
 
 // GetUsers retrieves all users from the database.
 // It returns a list of users or an error message if the retrieval fails.
+// If there are no users in the database, it responds with an HTTP 404 Not Found status.
+// If the retrieval is successful, it responds with an HTTP 200 OK status and the list of users in JSON format.
+// If there is an error during retrieval, it responds with an HTTP 500 Internal Server Error status.
 func GetUsers(c *gin.Context, db *gorm.DB) {
 	users, err := models.GetAllUsers(db)
 
@@ -40,6 +45,9 @@ func GetUsers(c *gin.Context, db *gorm.DB) {
 
 // SearchAllUsers performs a search for users based on provided query parameters.
 // It constructs a search query dynamically and returns the matching users or an appropriate error message.
+// If no users are found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the list of users in JSON format.
+// If there is an error during retrieval, it responds with an HTTP 500 Internal Server Error status.
 func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -66,6 +74,8 @@ func SearchAllUsers(c *gin.Context, db *gorm.DB) {
 
 // CreateUser handles the creation of a new user from JSON input.
 // It validates the input and stores the new user in the database, responding to the created user or an error message.
+// If the user is created successfully, it responds with an HTTP 201 Created status and the user details in JSON format.
+// If there is an error during creation, it responds with an HTTP 500 Internal Server Error status.
 func CreateUser(c *gin.Context, db *gorm.DB) {
 	var newUser models.User
 
@@ -108,6 +118,9 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 
 // UpdateUser handles updating an existing user.
 // It validates the user's existence and the provided input, then updates the user in the database.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
+// If the input data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated user details in JSON format.
 func UpdateUser(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -166,6 +179,8 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 
 // DeleteUser handles the deletion of a user by ID.
 // It validates the user's existence and removes the user from the database, responding with an appropriate message.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
 func DeleteUser(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -186,6 +201,8 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 
 // checkUser performs validation checks on user data.
 // It returns a boolean indicating failure and an error with the validation issue.
+// If the data is valid, it returns false and nil.
+// If the data is invalid, it returns true and an error message.
 func checkUser(user models.User, newUser models.User, isCreating bool) (bool, error) {
 	switch true {
 	case !user.SetFirstName(newUser.First_Name):
@@ -209,6 +226,10 @@ func checkUser(user models.User, newUser models.User, isCreating bool) (bool, er
 	return false, nil
 }
 
+// GetUserByUN retrieves a single user by username.
+// It returns the user details or an error message if the user is not found.
+// If the user is found, it responds with an HTTP 200 OK status and the user details in JSON format.
+// If the user is not found, it responds with an HTTP 404 Not Found status.
 func GetUserByUN(username string, db *gorm.DB) (*models.User, error) {
 	var user models.User
 	if err := db.Where("username = ?", username).First(&user).Error; err != nil {

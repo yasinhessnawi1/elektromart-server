@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllReviews tests the retrieval of all reviews from the database.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllReviews(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -28,6 +31,9 @@ func TestGetAllReviews(t *testing.T) {
 }
 
 // TestReview_SetProductID tests setting the product ID after verifying the product exists.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReview_SetProductID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -48,7 +54,10 @@ func TestReview_SetProductID(t *testing.T) {
 	assert.False(t, result)
 }
 
-// TestReview_SetUserID tests setting the user ID after verifying the user exists.
+// TestReview_SetUserID tests setting the user ID after verifying the user exists
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReview_SetUserID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -70,6 +79,9 @@ func TestReview_SetUserID(t *testing.T) {
 }
 
 // TestReview_SetRating tests setting the rating after validating it with predefined rules.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReview_SetRating(t *testing.T) {
 	review := Review{}
 	assert.False(t, review.SetRating(-1), "Rating should be invalid because it is negative")
@@ -77,6 +89,9 @@ func TestReview_SetRating(t *testing.T) {
 }
 
 // TestReview_SetComment tests setting the comment after validating its length.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReview_SetComment(t *testing.T) {
 	review := Review{}
 	assert.False(t, review.SetComment(string(make([]byte, 256))), "Comment should be invalid due to length")
@@ -84,6 +99,9 @@ func TestReview_SetComment(t *testing.T) {
 }
 
 // TestReview_SetReviewDate tests setting the review date after validating it as a valid date string.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReview_SetReviewDate(t *testing.T) {
 	review := Review{}
 	assert.False(t, review.SetReviewDate("20210421"), "Review date should be invalid due to format")
@@ -91,6 +109,9 @@ func TestReview_SetReviewDate(t *testing.T) {
 }
 
 // TestReviewExists tests checking if a specific review exists in the database by its ID.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestReviewExists(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -109,6 +130,9 @@ func TestReviewExists(t *testing.T) {
 }
 
 // TestSearchReview tests the search functionality based on provided parameters.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchReview(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)

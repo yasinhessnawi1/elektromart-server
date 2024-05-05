@@ -50,7 +50,7 @@ func (u *User) SetUsername(username string) bool {
 	}
 }
 
-// SetUsername sets the username for the user after validating its uniqueness and length.
+// SetPhone sets the username for the user after validating its uniqueness and length.
 // Returns true if the username is within the allowed length and unique, otherwise false.
 func (u *User) SetPhone(phone string) bool {
 	if !tools.CheckPhone(phone, 11) {

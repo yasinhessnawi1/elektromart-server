@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDBOrderItem sets up the router and database in memory, including the migration of Order, Product, and OrderItem models.
+// It returns the router, database, and a teardown function to clean up the database after tests finish.
 func setupRouterAndDBOrderItem(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +40,8 @@ func setupRouterAndDBOrderItem(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 }
 
 // TestGetOrderItem_Success verifies that fetching an existing order item by ID correctly returns the order item.
+// It creates an order, product, and order item in the database, then fetches the order item by ID.
+// The test checks the response status code, the order item ID, and the quantity.
 func TestGetOrderItem_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -70,6 +73,8 @@ func TestGetOrderItem_Success(t *testing.T) {
 }
 
 // TestGetOrderItem_NotFound checks the response for a non-existent order item.
+// It fetches an order item by an ID that does not exist in the database and checks the response status code and error message.
+// The test expects a 404 Not Found status code and an error message indicating that the order item was not found.
 func TestGetOrderItem_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -92,6 +97,8 @@ func TestGetOrderItem_NotFound(t *testing.T) {
 }
 
 // TestGetOrderItems_Success checks if GetOrderItems returns all order items from the database.
+// It creates two order items in the database and fetches all order items, checking the response status code and the number of order items.
+// The test expects a 200 OK status code and two order items in the response.
 func TestGetOrderItems_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -121,6 +128,8 @@ func TestGetOrderItems_Success(t *testing.T) {
 }
 
 // TestGetOrderItems_Empty checks the response when no order items are available in the database.
+// It fetches all order items from an empty database and checks the response status code and the number of order items.
+// The test expects a 200 OK status code and an empty list of order items in the response.
 func TestGetOrderItems_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -143,6 +152,8 @@ func TestGetOrderItems_Empty(t *testing.T) {
 }
 
 // TestSearchAllOrderItems_Success checks if SearchAllOrderItems returns order items based on search parameters.
+// It creates an order, product, and order item in the database and fetches the order item by quantity.
+// The test checks the response status code, the number of order items, and the quantity of the order item.
 func TestSearchAllOrderItems_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -172,6 +183,8 @@ func TestSearchAllOrderItems_Success(t *testing.T) {
 }
 
 // TestSearchAllOrderItems_NotFound checks if SearchAllOrderItems responds correctly when no order items match the search criteria.
+// It fetches order items with a quantity that does not exist in the database and checks the response status code and error message.
+// The test expects a 404 Not Found status code and an error message indicating that no order items were found.
 func TestSearchAllOrderItems_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -194,6 +207,8 @@ func TestSearchAllOrderItems_NotFound(t *testing.T) {
 }
 
 // TestCreateOrderItem_Success checks that an order item can be successfully created with valid data.
+// It creates an order and product in the database and sends a request to create a new order item.
+// The test checks the response status code, the order ID, the product ID, the quantity, and the subtotal.
 func TestCreateOrderItem_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -226,6 +241,8 @@ func TestCreateOrderItem_Success(t *testing.T) {
 }
 
 // TestCreateOrderItem_InvalidData checks the response when incomplete or incorrect data is sent.
+// It sends a request to create an order item with invalid JSON data and checks the response status code and error message.
+// The test expects a 400 Bad Request status code and an error message indicating that the JSON data is invalid.
 func TestCreateOrderItem_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -250,6 +267,8 @@ func TestCreateOrderItem_InvalidData(t *testing.T) {
 }
 
 // TestUpdateOrderItem_Valid checks the ability to update an existing order item.
+// It creates an order, product, and order item in the database and sends a request to update the order item.
+// The test checks the response status code, the updated quantity, and the updated subtotal.
 func TestUpdateOrderItem_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -282,6 +301,8 @@ func TestUpdateOrderItem_Valid(t *testing.T) {
 }
 
 // TestUpdateOrderItem_Invalid checks the error message with invalid data.
+// It sends a request to update an order item with invalid JSON data and checks the response status code and error message.
+// The test expects a 400 Bad Request status code and an error message indicating that the JSON data is invalid.
 func TestUpdateOrderItem_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -313,6 +334,8 @@ func TestUpdateOrderItem_Invalid(t *testing.T) {
 }
 
 // TestDeleteOrderItem_Valid checks that an order item is deleted from the database.
+// It creates an order, product, and order item in the database and sends a request to delete the order item.
+// The test checks the response status code and the absence of the order item in the database.
 func TestDeleteOrderItem_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()
@@ -336,6 +359,9 @@ func TestDeleteOrderItem_Valid(t *testing.T) {
 }
 
 // TestDeleteOrderItem_Invalid checks the delete order item with invalid ID.
+// It sends a request to delete an order item with an ID that does not exist in the database and checks
+// the response status code and error message.
+// The test expects a 404 Not Found status code and an error message indicating that the order item was not found.
 func TestDeleteOrderItem_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrderItem(t)
 	defer teardown()

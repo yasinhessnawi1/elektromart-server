@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDBPayment sets up the router and database in memory, including the migration of Order and Payment models.
+// It returns the router, database, and a teardown function to clean up the database after tests finish.
 func setupRouterAndDBPayment(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +40,8 @@ func setupRouterAndDBPayment(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 }
 
 // TestGetPayment_Success checks if GetPayment correctly returns a payment by ID.
+// It creates an order and payment in the database, then sends a GET request to retrieve the payment.
+// The response is checked for the correct status code and payment details.
 func TestGetPayment_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -66,6 +69,8 @@ func TestGetPayment_Success(t *testing.T) {
 }
 
 // TestGetPayment_NotFound checks the response for a non-existent payment.
+// It sends a GET request with an invalid ID and checks the response for a 404 status code and an error message.
+// The error message should indicate that the payment was not found.
 func TestGetPayment_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -88,6 +93,9 @@ func TestGetPayment_NotFound(t *testing.T) {
 }
 
 // TestGetPayments_Success verifies that all payments are correctly retrieved from the database.
+// It creates two payments for an order and sends a GET request to retrieve all payments.
+// The response is checked for the correct status code and the expected number of payments.
+// The test uses the GET /payments route to retrieve all payments.
 func TestGetPayments_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -115,6 +123,9 @@ func TestGetPayments_Success(t *testing.T) {
 }
 
 // TestSearchAllPayments_Success checks if payments are correctly retrieved based on search parameters.
+// It creates a payment and sends a GET request with a search parameter to retrieve the payment.
+// The response is checked for the correct status code and the expected number of payments.
+// The test uses the GET /payments/search route to search for payments.
 func TestSearchAllPayments_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -141,6 +152,9 @@ func TestSearchAllPayments_Success(t *testing.T) {
 }
 
 // TestCreatePayment_Success checks that a payment can be successfully created with valid data.
+// It creates an order in the database and sends a POST request with payment details to create a new payment.
+// The response is checked for the correct status code and the expected payment details.
+// The test uses the POST /payments route to create a new payment.
 func TestCreatePayment_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -169,6 +183,9 @@ func TestCreatePayment_Success(t *testing.T) {
 }
 
 // TestCreatePayment_InvalidData checks the response when incomplete or incorrect data is sent.
+// It sends a POST request with invalid payment details and checks the response for a 400 status code and an error message.
+// The error message should indicate that the JSON data is invalid.
+// The test uses the POST /payments route to create a new payment.
 func TestCreatePayment_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -193,6 +210,9 @@ func TestCreatePayment_InvalidData(t *testing.T) {
 }
 
 // TestUpdatePayment_Valid checks the ability to update an existing payment.
+// It creates an order and payment in the database, then sends a PUT request to update the payment status.
+// The response is checked for the correct status code and the updated payment status.
+// The test uses the PUT /payments/:id route to update an existing payment.
 func TestUpdatePayment_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -222,6 +242,9 @@ func TestUpdatePayment_Valid(t *testing.T) {
 }
 
 // TestUpdatePayment_Invalid checks the error message with invalid data.
+// It sends a PUT request with invalid payment details and checks the response for a 400 status code and an error message.
+// The error message should indicate that the JSON data is invalid.
+// The test uses the PUT /payments/:id route to update an existing payment.
 func TestUpdatePayment_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -251,6 +274,9 @@ func TestUpdatePayment_Invalid(t *testing.T) {
 }
 
 // TestDeletePayment_Valid checks that a payment is deleted from the database.
+// It creates an order and payment in the database, then sends a DELETE request to remove the payment.
+// The response is checked for the correct status code.
+// The test uses the DELETE /payments/:id route to delete an existing payment.
 func TestDeletePayment_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()
@@ -272,6 +298,9 @@ func TestDeletePayment_Valid(t *testing.T) {
 }
 
 // TestDeletePayment_Invalid checks the delete payment with invalid ID.
+// It sends a DELETE request with an invalid payment ID and checks the response for a 404 status code and an error message.
+// The error message should indicate that the payment was not found.
+// The test uses the DELETE /payments/:id route to delete an existing payment.
 func TestDeletePayment_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBPayment(t)
 	defer teardown()

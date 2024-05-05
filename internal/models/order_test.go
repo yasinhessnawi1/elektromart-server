@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllOrders checks at this function returns all records correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllOrders(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -35,6 +38,9 @@ func TestGetAllOrders(t *testing.T) {
 }
 
 // TestOrder_SetUserID Checks setting the user ID of the order
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestOrder_SetUserID(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -62,6 +68,9 @@ func TestOrder_SetUserID(t *testing.T) {
 }
 
 // TestOrder_SetOrderDate checks if this function works correctly.
+// It creates a new instance of the Order struct and calls the SetOrderDate function with a valid date.
+// It then checks if the date was set correctly and if the function returned true.
+// It repeats the process with an invalid date and checks if the date was not set and the function returned false.
 func TestOrder_SetOrderDate(t *testing.T) {
 	order := Order{}
 	assert.True(t, order.SetOrderDate("2023-01-01"), "Order date should be valid")
@@ -69,6 +78,9 @@ func TestOrder_SetOrderDate(t *testing.T) {
 }
 
 // TestOrder_SetTotalAmount checks if this function works correctly.
+// It creates a new instance of the Order struct and calls the SetTotalAmount function with a valid amount.
+// It then checks if the amount was set correctly and if the function returned true.
+// It repeats the process with an invalid amount and checks if the amount was not set and the function returned false.
 func TestOrder_SetTotalAmount(t *testing.T) {
 	order := Order{}
 	assert.True(t, order.SetTotalAmount(100.0), "Total amount should be valid")
@@ -76,6 +88,9 @@ func TestOrder_SetTotalAmount(t *testing.T) {
 }
 
 // TestOrder_SetStatus checks if this function works correctly.
+// It creates a new instance of the Order struct and calls the SetStatus function with a valid status.
+// It then checks if the status was set correctly and if the function returned true.
+// It repeats the process with an invalid status and checks if the status was not set and the function returned false.
 func TestOrder_SetStatus(t *testing.T) {
 	order := Order{}
 	assert.True(t, order.SetStatus("pending"), "Status date should be valid")
@@ -83,6 +98,9 @@ func TestOrder_SetStatus(t *testing.T) {
 }
 
 // TestOrderExists Checks if the function works correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestOrderExists(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -109,6 +127,9 @@ func TestOrderExists(t *testing.T) {
 }
 
 // TestSearchOrder Checks if the function works correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchOrder(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()

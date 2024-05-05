@@ -5,13 +5,17 @@ import (
 	"testing"
 )
 
-// TestGenerateUUID by ensuring it returns a non zero value.
+// TestGenerateUUID by ensuring it returns a non-zero value.
+// This test checks if the GenerateUUID function returns a non-zero value.
 func TestGenerateUUID(t *testing.T) {
 	// Generate a random UUID
 	uuid := GenerateUUID()
 	assert.NotZero(t, uuid, "GenerateUUID should return a non zero uint32")
 }
 
+// TestConvertStringToUint tests the conversion of string to uint32.
+// It checks if the function can convert a string to a uint32 and returns the correct value.
+// It also checks if the function returns 0 when the conversion fails.
 func TestConvertStringToUint(t *testing.T) {
 	tests := []struct {
 		name        string

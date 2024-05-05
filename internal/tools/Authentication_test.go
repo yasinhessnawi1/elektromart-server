@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+// TestGenerateToken tests generating a JWT token
+// It creates a new instance of the JWTTokenService and calls the GenerateToken function
+// It then checks if the token was generated successfully
+// Finally, it checks if the token is valid
 func TestGenerateTokenWithClaims(t *testing.T) {
 	tokenService := JWTTokenService{}
 
@@ -31,6 +35,10 @@ func TestGenerateTokenWithClaims(t *testing.T) {
 	}
 }
 
+// TestTokenAuthMiddlewareWithValidToken tests the TokenAuthMiddleware with a valid token
+// It creates a new instance of the gin router and sets up a protected route
+// It then creates a valid token and sends a request to the protected route with the token
+// Finally, it checks if the response status code is 200
 func TestTokenAuthMiddlewareWithValidToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -53,6 +61,10 @@ func TestTokenAuthMiddlewareWithValidToken(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+// TestTokenAuthMiddlewareWithInValidToken tests the TokenAuthMiddleware with an invalid token
+// It creates a new instance of the gin router and sets up a protected route
+// It then sends a request to the protected route with an invalid token
+// Finally, it checks if the response status code is 401
 func TestTokenAuthMiddlewareWithInValidToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 

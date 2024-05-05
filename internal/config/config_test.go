@@ -7,6 +7,8 @@ import (
 )
 
 // TestLoadConfig tests loading of environment variables from a .env file
+// It creates a temporary .env file, writes a variable to it, and then loads the file
+// The test checks if the variable is loaded correctly
 func TestLoadConfig(t *testing.T) {
 	// Create a temporary .env file
 	file, err := os.Create(".env")
@@ -29,6 +31,8 @@ func TestLoadConfig(t *testing.T) {
 }
 
 // TestGetConfig checks if the correct value is returned for an environment variable
+// It sets an environment variable, retrieves it using GetConfig, and checks if the value is correct
+// It also tests the retrieval of a non-existent variable
 func TestGetConfig(t *testing.T) {
 	// Set environment variable
 	os.Setenv("TEST_VAR", "value")

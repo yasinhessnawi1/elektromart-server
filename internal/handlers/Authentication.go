@@ -8,6 +8,11 @@ import (
 	"net/http"
 )
 
+// PostLogin handles the login request.
+// It validates the user credentials and generates a JWT token if the credentials are correct.
+// It sends an HTTP 200 OK response with the token if successful.
+// In case of incorrect credentials, it sends an HTTP 401 Unauthorized response.
+// If there is a server error, it sends an HTTP 500 Internal Server Error.
 func PostLogin(c *gin.Context, db *gorm.DB, tokenService tools.TokenService) {
 	var loginCredentials struct {
 		Username string `json:"username"`
