@@ -7,7 +7,7 @@ import (
 )
 
 // LoadConfig loads environment variables from a .env file located in the same directory as the application.
-// It uses the godotenv package to load the file. If no .env file is found, it logs a message but does not terminate the application.
+// It uses the go dotenv package to load the file. If no .env file is found, it logs a message but does not terminate the application.
 // This function is typically called at the start of the application to initialize environment settings.
 func LoadConfig() {
 	if err := godotenv.Load(); err != nil {
