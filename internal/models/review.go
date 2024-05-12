@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// Review represents the review model for products.
+// It includes fields for Product_ID, User_ID, Rating, Comment, and Review_Date.
 type Review struct {
 	gorm.Model
 	Product_ID  uint32 `json:"product_id"`
@@ -14,6 +16,8 @@ type Review struct {
 	Review_Date string `json:"review_date"`
 }
 
+// GetAllReviews retrieves all reviews from the database.
+// If the fetch is successful, it returns the list of reviews, otherwise an error message.
 func GetAllReviews(db *gorm.DB) ([]Review, error) {
 	var reviews []Review
 	if err := db.Find(&reviews).Error; err != nil {
@@ -22,6 +26,8 @@ func GetAllReviews(db *gorm.DB) ([]Review, error) {
 	return reviews, nil
 }
 
+// SetProductID sets the product ID for the review after verifying the existence of the product.
+// Returns true if the product exists and the ID is set; otherwise, it returns false.
 func (r *Review) SetProductID(product_id uint32, db *gorm.DB) bool {
 	if !ProductExists(db, product_id) {
 		return false
@@ -31,6 +37,8 @@ func (r *Review) SetProductID(product_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetUserID sets the user ID for the review after verifying the existence of the user.
+// Returns true if the user exists and the ID is set; otherwise, it returns false.
 func (r *Review) SetUserID(user_id uint32, db *gorm.DB) bool {
 	if !UserExists(db, user_id) {
 		return false
@@ -40,6 +48,8 @@ func (r *Review) SetUserID(user_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetRating sets the rating for the review.
+// It validates the rating to ensure it meets certain criteria and returns true if valid.
 func (r *Review) SetRating(rating int) bool {
 	if !tools.CheckRating(rating) {
 		return false
@@ -49,6 +59,8 @@ func (r *Review) SetRating(rating int) bool {
 	}
 }
 
+// SetComment sets the comment for the review.
+// It validates the comment to ensure it meets certain criteria and returns true if valid.
 func (r *Review) SetComment(comment string) bool {
 	if !tools.CheckString(comment, 255) {
 		return false
@@ -58,6 +70,8 @@ func (r *Review) SetComment(comment string) bool {
 	}
 }
 
+// SetReviewDate sets the review date for the review.
+// It validates the date format and returns true if the date is valid; otherwise, it returns false.
 func (r *Review) SetReviewDate(review_date string) bool {
 	if !tools.CheckDate(review_date) {
 		return false
@@ -67,6 +81,8 @@ func (r *Review) SetReviewDate(review_date string) bool {
 	}
 }
 
+// ReviewExists checks if a review exists in the database by its ID.
+// It returns true if the review is found, otherwise returns false.
 func ReviewExists(db *gorm.DB, id uint32) bool {
 	var review Review
 	if db.Where("id = ?", id).First(&review).Error != nil {
@@ -75,6 +91,8 @@ func ReviewExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchReview retrieves reviews from the database based on the search parameters provided.
+// It returns a slice of reviews that match the criteria or an error if the search fails.
 func SearchReview(db *gorm.DB, searchParams map[string]interface{}) ([]Review, error) {
 	var reviews []Review
 	query := db.Model(&Review{})

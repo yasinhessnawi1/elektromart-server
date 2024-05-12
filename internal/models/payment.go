@@ -92,6 +92,11 @@ func PaymentExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchPayment performs a search for a payment based on the provided search parameters.
+// It constructs a search query dynamically and returns the matching payment or an error if not found.
+// If the search is successful, it returns the payment.
+// If no payment is found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the payment details in JSON format.
 func SearchPayment(db *gorm.DB, searchParams map[string]interface{}) ([]Payment, error) {
 	var payments []Payment
 	query := db.Model(&Payment{})

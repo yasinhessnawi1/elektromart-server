@@ -36,6 +36,10 @@ func GetOrders(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, orders)
 }
 
+// SearchAllOrders retrieves all orders from the database based on the search parameters provided in the query string.
+// It responds with a list of orders if successful or an informational message if no orders exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
+// The search parameters include user_id, order_date, total_amount, and status.
 func SearchAllOrders(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -75,6 +79,9 @@ func SearchAllOrders(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, orders)
 }
 
+// CreateOrder handles the creation of a new order based on the JSON input.
+// It validates the input and creates the order in the database, returning the created order or an error message.
+// The user_id, order_date, total_amount, and status fields are validated for correct formatting.
 func CreateOrder(c *gin.Context, db *gorm.DB) {
 	var newOrder models.Order
 	if err := c.ShouldBindJSON(&newOrder); err != nil {
@@ -107,6 +114,7 @@ func CreateOrder(c *gin.Context, db *gorm.DB) {
 
 // UpdateOrder handles the updating of an existing order based on the JSON input and the ID provided in the URL.
 // It validates the input and updates the order in the database, returning the updated order or an error message.
+// The user_id, order_date, total_amount, and status fields are validated for correct formatting.
 func UpdateOrder(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -147,6 +155,7 @@ func UpdateOrder(c *gin.Context, db *gorm.DB) {
 
 // DeleteOrder removes an order from the database based on the ID provided in the URL.
 // It responds with HTTP 204 No Content on successful deletion or an error message if the order is not found or deletion fails.
+// The order is soft-deleted using the Unscoped method to preserve data integrity.
 func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -165,6 +174,8 @@ func DeleteOrder(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkOrder validates the input data for an order and returns an error if the data is invalid.
+// It checks the order's user_id, order_date, total_amount, and status fields for correct formatting.
 func checkOrder(order models.Order, newOrder models.Order, db *gorm.DB) (bool, error) {
 	switch true {
 	case !order.SetUserID(newOrder.User_ID, db):

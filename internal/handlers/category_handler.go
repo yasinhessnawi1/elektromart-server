@@ -36,6 +36,9 @@ func GetCategories(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// SearchAllCategories retrieves all categories from the database based on the search parameters provided in the query string.
+// Responds with a list of categories if successful or an informational message if no categories exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
 func SearchAllCategories(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -146,6 +149,10 @@ func DeleteCategory(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkCategory validates the input data for a category and returns an error if the data is invalid.
+// It checks the name and description fields for correct formatting.
+// Returns true if the data is invalid, along with an error message.
+// Returns false if the data is valid.
 func checkCategory(category models.Category, newCategory models.Category) (bool, error) {
 	switch true {
 	case !category.SetName(newCategory.Name):

@@ -36,6 +36,10 @@ func GetOrderItems(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, orderItems)
 }
 
+// SearchAllOrderItems retrieves all order items from the database based on the search parameters provided in the query string.
+// It responds with a list of order items if successful or an informational message if no order items exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
+// The search parameters include order_id, product_id, quantity, and subtotal.
 func SearchAllOrderItems(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -144,7 +148,8 @@ func UpdateOrderItem(c *gin.Context, db *gorm.DB) {
 }
 
 // DeleteOrderItem removes an order item from the database based on its ID.
-// It handles the deletion process and responds with HTTP 204 No Content on success or an error message if not found or deletion fails.
+// It handles the deletion process and responds with HTTP 204 No Content
+// on success or an error message if not found or deletion fails.
 func DeleteOrderItem(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -163,6 +168,9 @@ func DeleteOrderItem(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkOrderItem validates the input data for an order item and returns an error if the data is invalid.
+// It checks the order_id, product_id, quantity, and subtotal fields for correct formatting.
+// It also verifies the existence of the order and product in the database.
 func checkOrderItem(orderItem models.OrderItem, newOrderItem models.OrderItem, db *gorm.DB) (bool, error) {
 	switch true {
 	case !orderItem.SetOrderID(newOrderItem.Order_ID, db):

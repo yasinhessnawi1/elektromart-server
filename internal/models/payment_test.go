@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllPayments ensures that all payments are retrieved correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllPayments(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -28,6 +31,9 @@ func TestGetAllPayments(t *testing.T) {
 }
 
 // TestPayment_SetOrderID checks that the order ID is set only after validating the order exists.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestPayment_SetOrderID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -49,6 +55,9 @@ func TestPayment_SetOrderID(t *testing.T) {
 }
 
 // TestPayment_SetPaymentMethod checks that the payment method is set only if it is valid.
+// It creates a new instance of the Payment struct and calls the SetPaymentMethod function with a valid method.
+// It then checks if the method was set correctly and if the function returned true.
+// It repeats the process with an invalid method and checks if the method was not set and the function returned false.
 func TestPayment_SetPaymentMethod(t *testing.T) {
 	payment := Payment{}
 	assert.False(t, payment.SetPaymentMethod("Invalid Method"))
@@ -56,6 +65,9 @@ func TestPayment_SetPaymentMethod(t *testing.T) {
 }
 
 // TestPayment_SetAmount checks the validity and setting of the payment amount.
+// It creates a new instance of the Payment struct and calls the SetAmount function with a valid amount.
+// It then checks if the amount was set correctly and if the function returned true.
+// It repeats the process with an invalid amount and checks if the amount was not set and the function returned false.
 func TestPayment_SetAmount(t *testing.T) {
 	payment := Payment{}
 	assert.False(t, payment.SetAmount(-100.0))
@@ -63,6 +75,9 @@ func TestPayment_SetAmount(t *testing.T) {
 }
 
 // TestPayment_SetPaymentDate checks the date setting and validation logic.
+// It creates a new instance of the Payment struct and calls the SetPaymentDate function with a valid date.
+// It then checks if the date was set correctly and if the function returned true.
+// It repeats the process with an invalid date and checks if the date was not set and the function returned false.
 func TestPayment_SetPaymentDate(t *testing.T) {
 	payment := Payment{}
 	assert.False(t, payment.SetPaymentDate("not-a-date"))
@@ -70,6 +85,9 @@ func TestPayment_SetPaymentDate(t *testing.T) {
 }
 
 // TestPayment_SetStatus checks the status setting and validation logic.
+// It creates a new instance of the Payment struct and calls the SetStatus function with a valid status.
+// It then checks if the status was set correctly and if the function returned true.
+// It repeats the process with an invalid status and checks if the status was not set and the function returned false.
 func TestPayment_SetStatus(t *testing.T) {
 	payment := Payment{}
 	assert.False(t, payment.SetStatus("unknown"), "Status should be invalid")
@@ -78,6 +96,9 @@ func TestPayment_SetStatus(t *testing.T) {
 }
 
 // TestPaymentExists checks if a payment exists in the database by its ID.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestPaymentExists(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -96,6 +117,9 @@ func TestPaymentExists(t *testing.T) {
 }
 
 // TestSearchPayment checks the query functionality to search for payments based on provided parameters.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchPayment(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)

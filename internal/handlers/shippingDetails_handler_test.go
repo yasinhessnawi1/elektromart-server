@@ -16,6 +16,7 @@ import (
 )
 
 // setupRouterAndDBShippingDetail sets up the router and the database for testing, including the Order model.
+// It returns the router, database, and a function to clean up the database after testing.
 func setupRouterAndDBShippingDetail(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +40,9 @@ func setupRouterAndDBShippingDetail(t *testing.T) (*gin.Engine, *gorm.DB, func()
 }
 
 // TestGetShippingDetail_Success tests successful retrieval of a shipping detail by ID.
+// It creates a new shipping detail, then attempts to retrieve it by ID.
+// If the retrieval is successful, it checks the response status code and the shipping detail's address.
+// If the retrieval fails, it fails the test.
 func TestGetShippingDetail_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -67,6 +71,9 @@ func TestGetShippingDetail_Success(t *testing.T) {
 }
 
 // TestGetShippingDetail_NotFound tests retrieval failure when a shipping detail does not exist.
+// It attempts to retrieve a non-existing shipping detail by ID.
+// If the retrieval fails, it checks the response status code.
+// If the retrieval is successful, it fails the test.
 func TestGetShippingDetail_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -83,6 +90,9 @@ func TestGetShippingDetail_NotFound(t *testing.T) {
 }
 
 // TestGetShippingDetails_Success tests retrieval of all shipping details.
+// It creates multiple shipping details, then attempts to retrieve all of them.
+// If the retrieval is successful, it checks the response status code and the number of shipping details.
+// If the retrieval fails, it fails the test.
 func TestGetShippingDetails_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -116,6 +126,9 @@ func TestGetShippingDetails_Success(t *testing.T) {
 }
 
 // TestGetShippingDetails_Empty tests the scenario where no shipping details exist.
+// It attempts to retrieve all shipping details when none exist.
+// If the retrieval is successful, it checks the response status code and the number of shipping details.
+// If the retrieval fails, it fails the test.
 func TestGetShippingDetails_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -138,6 +151,9 @@ func TestGetShippingDetails_Empty(t *testing.T) {
 }
 
 // TestSearchAllShippingDetails_Success tests the successful search for shipping details based on specific criteria.
+// It creates a shipping detail and attempts to search for it based on the status field.
+// If the search is successful, it checks the response status code and the number of matching shipping details.
+// If the search fails, it fails the test.
 func TestSearchAllShippingDetails_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -167,6 +183,9 @@ func TestSearchAllShippingDetails_Success(t *testing.T) {
 }
 
 // TestSearchAllShippingDetails_Empty tests the scenario where a search query matches no existing shipping details.
+// It attempts to search for shipping details based on a non-existing status.
+// If the search is successful, it checks the response status code.
+// If the search fails, it fails the test.
 func TestSearchAllShippingDetails_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -183,6 +202,9 @@ func TestSearchAllShippingDetails_Empty(t *testing.T) {
 }
 
 // TestCreateShippingDetail_Success tests the successful creation of a new shipping detail.
+// It creates a new shipping detail and attempts to create it in the database.
+// If the creation is successful, it checks the response status code and the shipping detail's address.
+// If the creation fails, it fails the test.
 func TestCreateShippingDetail_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -211,6 +233,9 @@ func TestCreateShippingDetail_Success(t *testing.T) {
 }
 
 // TestCreateShippingDetail_InvalidData tests the creation of a shipping detail with invalid data.
+// It attempts to create a shipping detail with invalid data.
+// If the creation fails, it checks the response status code.
+// If the creation is successful, it fails the test.
 func TestCreateShippingDetail_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -229,6 +254,9 @@ func TestCreateShippingDetail_InvalidData(t *testing.T) {
 }
 
 // TestUpdateShippingDetail_Success tests the successful update of an existing shipping detail.
+// It creates an original shipping detail, then attempts to update it with new data.
+// If the update is successful, it checks the response status code and the updated shipping detail's address.
+// If the update fails, it fails the test.
 func TestUpdateShippingDetail_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -259,6 +287,9 @@ func TestUpdateShippingDetail_Success(t *testing.T) {
 }
 
 // TestUpdateShippingDetail_NotFound tests the scenario where an attempt is made to update a non-existing shipping detail.
+// It attempts to update a non-existing shipping detail with new data.
+// If the update fails, it checks the response status code.
+// If the update is successful, it fails the test.
 func TestUpdateShippingDetail_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -277,6 +308,9 @@ func TestUpdateShippingDetail_NotFound(t *testing.T) {
 }
 
 // TestDeleteShippingDetail_Valid tests the successful deletion of an existing shipping detail.
+// It creates a shipping detail, then attempts to delete it.
+// If the deletion is successful, it checks the response status code.
+// If the deletion fails, it fails the test.
 func TestDeleteShippingDetail_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()
@@ -298,6 +332,9 @@ func TestDeleteShippingDetail_Valid(t *testing.T) {
 }
 
 // TestDeleteShippingDetail_Invalid tests the scenario where an attempt is made to delete a non-existing shipping detail.
+// It attempts to delete a non-existing shipping detail.
+// If the deletion fails, it checks the response status code.
+// If the deletion is successful, it fails the test.
 func TestDeleteShippingDetail_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBShippingDetail(t)
 	defer teardown()

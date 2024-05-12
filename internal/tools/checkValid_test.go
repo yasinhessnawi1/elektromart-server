@@ -6,6 +6,8 @@ import (
 )
 
 // TestCheckString testing different cases of string inputs
+// It checks if the string is empty, valid, or exceeds the maximum length
+// Returns true if the string is within the valid range, otherwise false.
 func TestCheckString(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -27,6 +29,8 @@ func TestCheckString(t *testing.T) {
 }
 
 // TestCheckPassword testing different cases for password validation
+// It checks if the password is at least 8 characters long and includes at least one number, one uppercase letter, one lowercase letter, and one special character
+// Returns true if the password meets these criteria, otherwise false.
 func TestCheckPassword(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -48,6 +52,7 @@ func TestCheckPassword(t *testing.T) {
 }
 
 // TestCheckInt testing different cases for integer numbers validation
+// Returns true if the integer is 0 or positive, otherwise false.
 func TestCheckInt(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -67,6 +72,7 @@ func TestCheckInt(t *testing.T) {
 }
 
 // TestCheckRating testing different cases for rating validation
+// Returns true if the integer is between 0 and 5, otherwise false.
 func TestCheckRating(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -88,6 +94,7 @@ func TestCheckRating(t *testing.T) {
 }
 
 // TestCheckFloat testing different cases for floating numbers validation
+// Returns true if the number is 0.0 or greater, otherwise false.
 func TestCheckFloat(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -108,6 +115,7 @@ func TestCheckFloat(t *testing.T) {
 }
 
 // TestCheckEmail testing different cases for email validation
+// Returns true if the string looks like an email address, otherwise false.
 func TestCheckEmail(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -129,6 +137,7 @@ func TestCheckEmail(t *testing.T) {
 }
 
 // TestCheckStatus testing different cases for status validation
+// Returns true if the status is valid, otherwise false.
 func TestCheckStatus(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -148,6 +157,7 @@ func TestCheckStatus(t *testing.T) {
 }
 
 // TestCheckDate testing different cases for date validation
+// Returns true if the format is correct, otherwise false.
 func TestCheckDate(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -168,6 +178,7 @@ func TestCheckDate(t *testing.T) {
 }
 
 // TestCheckPaymentMethod testing different cases for payment validation
+// Returns true if the method is valid, otherwise false.
 func TestCheckPaymentMethod(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -187,6 +198,7 @@ func TestCheckPaymentMethod(t *testing.T) {
 }
 
 // TestCheckRole testing different cases for role validation
+// Returns true if the role is valid, otherwise false.
 func TestCheckRole(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+// GetShippingDetail retrieves a single shipping detail by its ID.
+// It checks for the shipping detail's existence and validity of its data, then returns the shipping detail details or an error message.
+// If the shipping detail is not found, it responds with an HTTP 404 Not Found status.
+// If the shipping detail is found, it responds with an HTTP 200 OK status and the shipping detail details in JSON format.
 func GetShippingDetail(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var shippingDetail models.ShippingDetails
@@ -22,6 +26,10 @@ func GetShippingDetail(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, shippingDetail)
 }
 
+// GetShippingDetails retrieves all shipping details from the database.
+// It returns a JSON response with a list of shipping details or an error message if the retrieval fails.
+// If there are no shipping details in the database, it responds with an HTTP 404 Not Found status.
+// If the retrieval is successful, it responds with an HTTP 200 OK status and the list of shipping details in JSON format.
 func GetShippingDetails(c *gin.Context, db *gorm.DB) {
 	shippingDetails, err := models.GetAllShippingDetails(db)
 	if err != nil {
@@ -31,6 +39,10 @@ func GetShippingDetails(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, shippingDetails)
 }
 
+// SearchAllShippingDetails performs a search on shipping details based on provided query parameters.
+// It constructs a search query dynamically and returns the matching shipping details or an appropriate error message.
+// If no shipping details are found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the list of shipping details in JSON format.
 func SearchAllShippingDetails(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -66,6 +78,10 @@ func SearchAllShippingDetails(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, shippingDetail)
 }
 
+// CreateShippingDetail creates a new shipping detail record in the database.
+// It validates the incoming JSON data, creates a new shipping detail, and returns the newly created shipping detail or an error message.
+// If the JSON data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the creation is successful, it responds with an HTTP 201 Created status and the created shipping detail in JSON format.
 func CreateShippingDetail(c *gin.Context, db *gorm.DB) {
 	var newShippingDetail models.ShippingDetails
 	if err := c.ShouldBindJSON(&newShippingDetail); err != nil {
@@ -97,6 +113,10 @@ func CreateShippingDetail(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusCreated, shippingDetail)
 }
 
+// UpdateShippingDetail updates an existing shipping detail record in the database.
+// It validates the incoming JSON data, updates the shipping detail, and returns the updated shipping detail or an error message.
+// If the JSON data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated shipping detail in JSON format.
 func UpdateShippingDetail(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -136,6 +156,10 @@ func UpdateShippingDetail(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, shippingDetail)
 }
 
+// DeleteShippingDetail deletes a shipping detail record from the database.
+// It checks for the existence of the shipping detail, deletes it, and responds with an appropriate status code.
+// If the shipping detail does not exist, it responds with an HTTP 404 Not Found status.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
 func DeleteShippingDetail(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -154,6 +178,10 @@ func DeleteShippingDetail(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkShippingDetail validates the new shipping detail data against the existing shipping detail.
+// It checks the order ID, address, shipping date, estimated arrival, and status fields for validity.
+// If any field is invalid, it returns an error message and true, indicating a failed validation.
+// If all fields are valid, it returns false and nil.
 func checkShippingDetail(shippingDetail models.ShippingDetails, newShippingDetail models.ShippingDetails, db *gorm.DB) (bool, error) {
 	switch true {
 	case !shippingDetail.SetOrderID(newShippingDetail.Order_ID, db):

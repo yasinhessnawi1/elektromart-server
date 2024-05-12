@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllOrderItems ensures that all order items are retrieved correctly.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllOrderItems(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -36,6 +39,9 @@ func TestGetAllOrderItems(t *testing.T) {
 }
 
 // TestOrderItem_SetOrderID ensures that the order id are set only if the referenced entity exits.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestOrderItem_SetOrderID(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -58,6 +64,9 @@ func TestOrderItem_SetOrderID(t *testing.T) {
 }
 
 // TestOrderItem_SetProductID ensures that the product id are set only if the referenced entity exits.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestOrderItem_SetProductID(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -80,6 +89,9 @@ func TestOrderItem_SetProductID(t *testing.T) {
 }
 
 // TestOrderItem_SetQuantity validate and set quantity
+// It creates a new instance of the OrderItem struct and calls the SetQuantity function with a valid quantity.
+// It then checks if the quantity was set correctly and if the function returned true.
+// It repeats the process with an invalid quantity and checks if the quantity was not set and the function returned false.
 func TestOrderItem_SetQuantity(t *testing.T) {
 	orderItem := OrderItem{}
 	assert.False(t, orderItem.SetQuantity(-1))
@@ -87,6 +99,9 @@ func TestOrderItem_SetQuantity(t *testing.T) {
 }
 
 // TestOrderItem_SetSubtotal validate and set subtotal
+// It creates a new instance of the OrderItem struct and calls the SetSubtotal function with a valid subtotal.
+// It then checks if the subtotal was set correctly and if the function returned true.
+// It repeats the process with an invalid subtotal and checks if the subtotal was not set and the function returned false.
 func TestOrderItem_SetSubtotal(t *testing.T) {
 	orderItem := OrderItem{}
 	assert.False(t, orderItem.SetSubtotal(-100.0))
@@ -94,6 +109,9 @@ func TestOrderItem_SetSubtotal(t *testing.T) {
 }
 
 // TestOrderItemExists checks if an order item exists by its ID
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestOrderItemExists(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()
@@ -113,6 +131,9 @@ func TestOrderItemExists(t *testing.T) {
 }
 
 // TestSearchOrderItem checks the query to search for order items based on provided parameters
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchOrderItem(t *testing.T) {
 	// Create a new instance of sql mock
 	db, mock, err := sqlmock.New()

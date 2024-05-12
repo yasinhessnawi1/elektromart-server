@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// ShippingDetails represents the shipping details model for an e-commerce transaction.
+// It includes fields for Order_ID, Address, Shipping_Date, Estimated_Arrival, and Status.
 type ShippingDetails struct {
 	gorm.Model
 	Order_ID          uint32 `json:"order_id"`
@@ -15,6 +17,8 @@ type ShippingDetails struct {
 	Status            string `json:"status"`
 }
 
+// GetAllShippingDetails retrieves all shipping details from the database.
+// It returns a slice of ShippingDetails or an error if the fetch fails.
 func GetAllShippingDetails(db *gorm.DB) ([]ShippingDetails, error) {
 	var shippingDetails []ShippingDetails
 	if err := db.Find(&shippingDetails).Error; err != nil {
@@ -23,6 +27,8 @@ func GetAllShippingDetails(db *gorm.DB) ([]ShippingDetails, error) {
 	return shippingDetails, nil
 }
 
+// SetOrderID sets the order ID for the shipping details after verifying the existence of the order.
+// Returns true if the order exists and the ID is set; otherwise, it returns false.
 func (s *ShippingDetails) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	if !OrderExists(db, order_id) {
 		return false
@@ -32,6 +38,8 @@ func (s *ShippingDetails) SetOrderID(order_id uint32, db *gorm.DB) bool {
 	}
 }
 
+// SetAddress sets the address for the shipping details after validating its length.
+// Returns true if the address is within the allowed length, otherwise false.
 func (s *ShippingDetails) SetAddress(address string) bool {
 	if !tools.CheckString(address, 255) {
 		return false
@@ -41,6 +49,8 @@ func (s *ShippingDetails) SetAddress(address string) bool {
 	}
 }
 
+// SetShippingDate sets the shipping date for the shipping details after validating the date format.
+// Returns true if the date is valid, otherwise false.
 func (s *ShippingDetails) SetShippingDate(shipping_date string) bool {
 	if !tools.CheckDate(shipping_date) {
 		return false
@@ -50,6 +60,8 @@ func (s *ShippingDetails) SetShippingDate(shipping_date string) bool {
 	}
 }
 
+// SetEstimatedArrival sets the estimated arrival date for the shipping details after validating the date format.
+// Returns true if the date is valid, otherwise false.
 func (s *ShippingDetails) SetEstimatedArrival(estimated_arrival string) bool {
 	if !tools.CheckDate(estimated_arrival) {
 		return false
@@ -59,6 +71,8 @@ func (s *ShippingDetails) SetEstimatedArrival(estimated_arrival string) bool {
 	}
 }
 
+// SetStatus sets the status for the shipping details after validating its length.
+// Returns true if the status is within the allowed length, otherwise false.
 func (s *ShippingDetails) SetStatus(status string) bool {
 	if !tools.CheckStatus(status, 255) {
 		return false
@@ -68,6 +82,8 @@ func (s *ShippingDetails) SetStatus(status string) bool {
 	}
 }
 
+// ShippingDetailsExists checks if a shipping details record exists in the database by its ID.
+// It returns true if the shipping details record is found, otherwise returns false.
 func ShippingDetailsExists(db *gorm.DB, id uint32) bool {
 	var shippingDetails ShippingDetails
 	if db.Where("id = ?", id).First(&shippingDetails).Error != nil {
@@ -76,6 +92,9 @@ func ShippingDetailsExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchShippingDetails adds a new shipping details record to the database.
+// It returns the new shipping details record or an error if the operation fails.
+// The shipping details record is created using the provided ShippingDetails struct.
 func SearchShippingDetails(db *gorm.DB, searchParams map[string]interface{}) ([]ShippingDetails, error) {
 	var shippingDetails []ShippingDetails
 	query := db.Model(&ShippingDetails{})

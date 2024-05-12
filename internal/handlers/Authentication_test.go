@@ -21,12 +21,18 @@ type MockTokenService struct {
 	mock.Mock
 }
 
+// GenerateTokenWithClaims mocks the token generation method.
+// It returns the token string and an error if the token generation fails.
+// The method is defined on the MockTokenService struct.
 func (m *MockTokenService) GenerateTokenWithClaims(username, role string) (string, error) {
 	args := m.Called(username, role)
 	return args.String(0), args.Error(1)
 }
 
 // TestPostLogin tests the login method with the given username and password in different cases.
+// It mocks the database and token service to test the login method.
+// It checks the response status and the response body for different cases.
+// It uses the gin test mode to test the login method.
 func TestPostLogin(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 

@@ -15,6 +15,7 @@ type Brands struct {
 
 // GetAllBrands retrieves all brands from the database.
 // It returns a slice of Brands and an error if there is any issue in fetching the data.
+// If the fetch is successful, it returns the list of brands, otherwise an error message.
 func GetAllBrands(db *gorm.DB) ([]Brands, error) {
 	var brands []Brands
 	if err := db.Find(&brands).Error; err != nil {
@@ -25,6 +26,7 @@ func GetAllBrands(db *gorm.DB) ([]Brands, error) {
 
 // SetName sets the name of the brand with validation.
 // It ensures the name does not exceed 255 characters. Returns true if set successfully, otherwise false.
+// It returns true if the name is within the allowed length, otherwise false.
 func (b *Brands) SetName(name string) bool {
 	if !tools.CheckString(name, 255) {
 		return false
@@ -36,6 +38,7 @@ func (b *Brands) SetName(name string) bool {
 
 // SetDescription sets the description of the brand with validation.
 // It ensures the description does not exceed 1000 characters. Returns true if set successfully, otherwise false.
+// It returns true if the description is within the allowed length, otherwise false.
 func (b *Brands) SetDescription(description string) bool {
 	if !tools.CheckString(description, 1000) {
 		return false
@@ -47,6 +50,7 @@ func (b *Brands) SetDescription(description string) bool {
 
 // BrandExists checks if a brand exists in the database by its ID.
 // It queries the database for the brand by the given ID and returns true if found, otherwise false.
+// It returns true if the brand exists, otherwise false.
 func BrandExists(db *gorm.DB, id uint32) bool {
 	var brand Brands
 	if err := db.Where("id = ?", id).First(&brand).Error; err != nil {
@@ -55,6 +59,10 @@ func BrandExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchBrand performs a search on brands based on provided query parameters.
+// It constructs a search query dynamically and returns the matching brand or an appropriate error message.
+// If no brand is found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the brand details in JSON format.
 func SearchBrand(db *gorm.DB, searchParams map[string]interface{}) (Brands, error) {
 	var brands Brands
 	query := db.Model(&Brands{})

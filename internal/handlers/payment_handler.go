@@ -35,6 +35,10 @@ func GetPayments(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, payments)
 }
 
+// SearchAllPayments retrieves all payments from the database based on the search parameters provided in the query string.
+// It responds with a list of payments if successful or an informational message if no payments exist.
+// On failure, it returns an HTTP 500 Internal Server Error.
+// The search parameters include order_id, payment_method, amount, payment_date, and status.
 func SearchAllPayments(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -74,6 +78,8 @@ func SearchAllPayments(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, payments)
 }
 
+// CreatePayment adds a new payment record to the database based on the JSON data provided in the request body.
+// It validates the input data and responds with the created payment or an error message if the data is invalid or creation fails.
 func CreatePayment(c *gin.Context, db *gorm.DB) {
 	var newPayment models.Payment
 	if err := c.ShouldBindJSON(&newPayment); err != nil {
@@ -106,7 +112,8 @@ func CreatePayment(c *gin.Context, db *gorm.DB) {
 }
 
 // UpdatePayment modifies an existing payment record based on the JSON input and the ID provided in the URL.
-// It checks the validity of the input data and updates the payment in the database, responding with the updated payment or an error message.
+// It checks the validity of the input data and updates the payment in the database, responding
+// with the updated payment or an error message.
 func UpdatePayment(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -147,7 +154,8 @@ func UpdatePayment(c *gin.Context, db *gorm.DB) {
 }
 
 // DeletePayment removes a payment record from the database based on its ID provided in the URL.
-// It handles the deletion process and responds with HTTP 204 No Content on success or an error message if the payment is not found or deletion fails.
+// It handles the deletion process and responds with HTTP 204 No Content on success or an
+// error message if the payment is not found or deletion fails.
 func DeletePayment(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -166,6 +174,8 @@ func DeletePayment(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkPayment validates the input data for a payment and returns an error if the data is invalid.
+// It checks the payment's order_id, payment_method, amount, payment_date, and status fields for correct formatting.
 func checkPayment(payment models.Payment, newPayment models.Payment, db *gorm.DB) (bool, error) {
 	switch true {
 	case !payment.SetOrderID(newPayment.Order_ID, db):

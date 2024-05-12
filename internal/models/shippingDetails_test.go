@@ -9,6 +9,9 @@ import (
 )
 
 // TestGetAllShippingDetails tests retrieving all shipping details from the database.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestGetAllShippingDetails(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -28,6 +31,9 @@ func TestGetAllShippingDetails(t *testing.T) {
 }
 
 // TestShippingDetails_SetOrderID tests setting the order ID after verifying the order exists.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestShippingDetails_SetOrderID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -49,6 +55,9 @@ func TestShippingDetails_SetOrderID(t *testing.T) {
 }
 
 // TestShippingDetails_SetAddress tests setting the shipping address after validating its length.
+// It creates a new instance of the ShippingDetails struct and calls the SetAddress function with a valid address.
+// It then checks if the address was set correctly and if the function returned true.
+// It repeats the process with an invalid address and checks if the address was not set and the function returned false.
 func TestShippingDetails_SetAddress(t *testing.T) {
 	details := ShippingDetails{}
 	assert.False(t, details.SetAddress(string(make([]byte, 256))), "Address should be invalid due to length")
@@ -56,6 +65,9 @@ func TestShippingDetails_SetAddress(t *testing.T) {
 }
 
 // TestShippingDetails_SetShippingDate tests setting the shipping date after validating its format.
+// It creates a new instance of the ShippingDetails struct and calls the SetShippingDate function with a valid date.
+// It then checks if the date was set correctly and if the function returned true.
+// It repeats the process with an invalid date and checks if the date was not set and the function returned false.
 func TestShippingDetails_SetShippingDate(t *testing.T) {
 	details := ShippingDetails{}
 	assert.False(t, details.SetShippingDate("20210601"), "Shipping date should be invalid due to format")
@@ -63,6 +75,9 @@ func TestShippingDetails_SetShippingDate(t *testing.T) {
 }
 
 // TestShippingDetails_SetEstimatedArrival tests setting the estimated arrival date after validating its format.
+// It creates a new instance of the ShippingDetails struct and calls the SetEstimatedArrival function with a valid date.
+// It then checks if the date was set correctly and if the function returned true.
+// It repeats the process with an invalid date and checks if the date was not set and the function returned false.
 func TestShippingDetails_SetEstimatedArrival(t *testing.T) {
 	details := ShippingDetails{}
 	assert.False(t, details.SetEstimatedArrival("20210701"), "Estimated arrival should be invalid due to format")
@@ -70,6 +85,9 @@ func TestShippingDetails_SetEstimatedArrival(t *testing.T) {
 }
 
 // TestShippingDetails_SetStatus tests setting the status after validating its length and contents.
+// It creates a new instance of the ShippingDetails struct and calls the SetStatus function with a valid status.
+// It then checks if the status was set correctly and if the function returned true.
+// It repeats the process with an invalid status and checks if the status was not set and the function returned false.
 func TestShippingDetails_SetStatus(t *testing.T) {
 	details := ShippingDetails{}
 	assert.False(t, details.SetStatus(""), "Status should be invalid due to being empty")
@@ -77,6 +95,9 @@ func TestShippingDetails_SetStatus(t *testing.T) {
 }
 
 // TestShippingDetailsExists tests checking if a specific shipping detail exists in the database by its ID.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestShippingDetailsExists(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -95,6 +116,9 @@ func TestShippingDetailsExists(t *testing.T) {
 }
 
 // TestSearchShippingDetails tests searching for shipping details based on provided parameters.
+// It creates a new instance of sql mock and sets up expectations for the query.
+// It then calls the function and checks if the returned data matches the expected data.
+// Finally, it checks if all the expectations were met.
 func TestSearchShippingDetails(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)

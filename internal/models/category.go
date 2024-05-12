@@ -55,6 +55,8 @@ func CategoryExists(db *gorm.DB, id uint32) bool {
 	return true
 }
 
+// SearchCategory performs a search for a category based on the provided search parameters.
+// It constructs a search query dynamically and returns the matching category or an error if not found.
 func SearchCategory(db *gorm.DB, searchParams map[string]interface{}) (Category, error) {
 	var category Category
 	query := db.Model(&Category{})

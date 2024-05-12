@@ -15,6 +15,8 @@ import (
 )
 
 // setupRouterAndDBOrder sets up the router and database in memory, and returns a function to clean up the database after tests.
+// It returns the router, database, and a teardown function.
+// It creates a new in-memory SQLite database and migrates the Order and User models.
 func setupRouterAndDBOrder(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
@@ -39,6 +41,7 @@ func setupRouterAndDBOrder(t *testing.T) (*gin.Engine, *gorm.DB, func()) {
 }
 
 // TestGetOrder_Success checks if GetOrder returns the correct order by given ID.
+// It creates a new order, sends an HTTP GET request to the GetOrder handler, and checks the response.
 func TestGetOrder_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -71,6 +74,8 @@ func TestGetOrder_Success(t *testing.T) {
 }
 
 // TestGetOrder_NotFound checks the response for a non-existent order.
+// It sends an HTTP GET request to the GetOrder handler with an invalid ID and checks the response.
+// The response should be an HTTP 404 Not Found with an error message.
 func TestGetOrder_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -93,6 +98,8 @@ func TestGetOrder_NotFound(t *testing.T) {
 }
 
 // TestGetOrders_Success checks if GetOrders returns all orders from the database.
+// It creates two mock orders, sends an HTTP GET request to the GetOrders handler, and checks the response.
+// The response should contain both orders and an HTTP 200 OK status.
 func TestGetOrders_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -119,6 +126,8 @@ func TestGetOrders_Success(t *testing.T) {
 }
 
 // TestGetOrders_Empty checks the response when no orders are available in the database.
+// It sends an HTTP GET request to the GetOrders handler and checks the response.
+// The response should be an empty list of orders and an HTTP 200 OK status.
 func TestGetOrders_Empty(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -140,6 +149,8 @@ func TestGetOrders_Empty(t *testing.T) {
 }
 
 // TestSearchAllOrders_Success checks if SearchAllOrders returns orders based on search parameters.
+// It creates two mock orders, sends an HTTP GET request to the SearchAllOrders handler with a search parameter, and checks the response.
+// The response should contain one order and an HTTP 200 OK status.
 func TestSearchAllOrders_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -167,6 +178,8 @@ func TestSearchAllOrders_Success(t *testing.T) {
 }
 
 // TestSearchAllOrders_NotFound checks if SearchAllOrders responds correctly when no orders match the search criteria.
+// It sends an HTTP GET request to the SearchAllOrders handler with a search parameter that doesn't match any orders and checks the response.
+// The response should be an HTTP 404 Not Found with an error message.
 func TestSearchAllOrders_NotFound(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -189,6 +202,8 @@ func TestSearchAllOrders_NotFound(t *testing.T) {
 }
 
 // TestCreateOrder_Success checks that an order can be successfully created with valid data.
+// It sends an HTTP POST request to the CreateOrder handler with valid order data and checks the response.
+// The response should contain the created order and an HTTP 201 Created status.
 func TestCreateOrder_Success(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -222,6 +237,8 @@ func TestCreateOrder_Success(t *testing.T) {
 }
 
 // TestCreateOrder_InvalidData checks the response when incomplete or incorrect data is sent.
+// It sends an HTTP POST request to the CreateOrder handler with invalid order data and checks the response.
+// The response should be an HTTP 400 Bad Request with an error message.
 func TestCreateOrder_InvalidData(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()
@@ -246,6 +263,8 @@ func TestCreateOrder_InvalidData(t *testing.T) {
 }
 
 // TestUpdateOrder_Valid checks the ability to update an existing order.
+// It creates an order, sends an HTTP PUT request to the UpdateOrder handler with updated data, and checks the response.
+// The response should contain the updated order and an HTTP 200 OK status.
 func TestUpdateOrder_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -285,6 +304,8 @@ func TestUpdateOrder_Valid(t *testing.T) {
 }
 
 // TestUpdateOrder_Invalid checks the error message with invalid data.
+// It creates an order, sends an HTTP PUT request to the UpdateOrder handler with invalid data, and checks the response.
+// The response should be an HTTP 400 Bad Request with an error message.
 func TestUpdateOrder_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -315,6 +336,8 @@ func TestUpdateOrder_Invalid(t *testing.T) {
 }
 
 // TestDeleteOrder_Valid checks that an order is deleted from the database.
+// It creates an order, sends an HTTP DELETE request to the DeleteOrder handler, and checks the response.
+// The response should be an HTTP 204 No Content status.
 func TestDeleteOrder_Valid(t *testing.T) {
 	router, db, teardown := setupRouterAndDBOrder(t)
 	defer teardown()
@@ -337,6 +360,8 @@ func TestDeleteOrder_Valid(t *testing.T) {
 }
 
 // TestDeleteOrder_Invalid checks the delete order with invalid ID.
+// It sends an HTTP DELETE request to the DeleteOrder handler with an invalid ID and checks the response.
+// The response should be an HTTP 404 Not Found with an error message.
 func TestDeleteOrder_Invalid(t *testing.T) {
 	router, db, teardown := setupRouterAndDB(t)
 	defer teardown()

@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+// GetReview retrieves a single review by its ID.
+// It checks for the review's existence and validity of its data, then returns the review details or an error message.
+// If the review is not found, it responds with an HTTP 404 Not Found status.
+// If the review is found, it responds with an HTTP 200 OK status and the review details in JSON format.
 func GetReview(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	var review models.Review
@@ -22,6 +26,10 @@ func GetReview(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, review)
 }
 
+// GetReviews retrieves all reviews from the database.
+// It returns a JSON response with a list of reviews or an error message if the retrieval fails.
+// If there are no reviews in the database, it responds with an HTTP 404 Not Found status.
+// If the retrieval is successful, it responds with an HTTP 200 OK status and the list of reviews in JSON format.
 func GetReviews(c *gin.Context, db *gorm.DB) {
 	reviews, err := models.GetAllReviews(db)
 	if err != nil {
@@ -31,6 +39,10 @@ func GetReviews(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, reviews)
 }
 
+// SearchAllReviews performs a search on reviews based on provided query parameters.
+// It constructs a search query dynamically and returns the matching reviews or an appropriate error message.
+// If no reviews are found, it responds with an HTTP 404 Not Found status.
+// If the search is successful, it responds with an HTTP 200 OK status and the list of reviews in JSON format.
 func SearchAllReviews(c *gin.Context, db *gorm.DB) {
 	searchParams := map[string]interface{}{}
 
@@ -64,6 +76,10 @@ func SearchAllReviews(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, reviews)
 }
 
+// CreateReview adds a new review to the database.
+// It validates the review data and responds with the newly created review or an error message.
+// If the review data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the creation is successful, it responds with an HTTP 201 Created status and the created review in JSON format.
 func CreateReview(c *gin.Context, db *gorm.DB) {
 	var newReview models.Review
 	if err := c.ShouldBindJSON(&newReview); err != nil {
@@ -95,6 +111,10 @@ func CreateReview(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusCreated, review)
 }
 
+// UpdateReview updates an existing review in the database.
+// It validates the updated review data and responds with the updated review or an error message.
+// If the review data is invalid, it responds with an HTTP 400 Bad Request status.
+// If the update is successful, it responds with an HTTP 200 OK status and the updated review in JSON format.
 func UpdateReview(c *gin.Context, db *gorm.DB) {
 	id := tools.ConvertStringToUint(c.Param("id"))
 
@@ -134,6 +154,10 @@ func UpdateReview(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, review)
 }
 
+// DeleteReview removes a review from the database.
+// It checks for the review's existence and responds with an appropriate status code.
+// If the review is not found, it responds with an HTTP 404 Not Found status.
+// If the deletion is successful, it responds with an HTTP 204 No Content status.
 func DeleteReview(c *gin.Context, db *gorm.DB) {
 	id := c.Param("id")
 	convertedId := tools.ConvertStringToUint(id)
@@ -152,6 +176,10 @@ func DeleteReview(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// checkReview validates the review data before creating or updating a review.
+// It checks the product ID, user ID, rating, comment, and review date for validity.
+// If any of the data is invalid, it returns an error message and true, indicating a failure.
+// If all data is valid, it returns false and nil, indicating success.
 func checkReview(review models.Review, newReview models.Review, db *gorm.DB) (bool, error) {
 	switch true {
 	case !review.SetProductID(newReview.Product_ID, db):
