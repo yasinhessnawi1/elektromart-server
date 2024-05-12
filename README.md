@@ -940,3 +940,36 @@ http://localhost:8081/shippingDetails/{id}
 }
 ```
 
+### searching
+- This part explains how the searching mechanism works on the different endpoints:
+
+| Resource          | Operation            | Endpoint                                                      |
+|-------------------|----------------------|---------------------------------------------------------------|
+| Users             | Search Users         | `GET http://localhost:8081/search-users/?username={name}`     |
+|                   |                      | `or /?email={email}`                                          |
+|                   |                      | `or /?firstname={firstname}&lastname={lastname}`              |
+|                   |                      | `or /?address={address}`                                      |
+| Shipping Details  | Search Shipping      | `GET http://localhost:8081/search-shippingDetails/?order_id={id}` |
+|                   | Details             | `or /?address={address}`                                      |
+|                   |                      | `or /?status={status}`                                        |
+| Reviews           | Search Reviews       | `GET http://localhost:8081/search-reviews/?product_id={id}`   |
+|                   |                      | `or /?comment={comment}`                                      |
+|                   |                      | `or /?rating={rating}&user_id={user_id}&review_date={date}`   |
+| Products          | Search Products      | `GET http://localhost:8081/search-products/?name={name}`      |
+|                   |                      | `or /?price={price}`                                          |
+|                   |                      | `or /?brand_name={brand}&category_name={category}`            |
+| Brands            | Search Brands        | `GET http://localhost:8081/search-brands/?name={name}`        |
+|                   |                      | `or /?description={description}`                              |
+| Categories        | Search Categories    | `GET http://localhost:8081/search-categories/?name={name}`    |
+|                   |                      | `or /?description={description}`                              |
+| Orders            | Search Orders        | `GET http://localhost:8081/search-orders/?user_id={id}`       |
+|                   |                      | `or /?total_amount={amount}`                                  |
+|                   |                      | `or /?status={status}`                                        |
+| Order Items       | Search Order Items   | `GET http://localhost:8081/search-orderItems/?order_id={id}`  |
+|                   |                      | `or /?quantity={quantity}`                                    |
+|                   |                      | `or /?product_id={product_id}`                                |
+| Payments          | Search Payments      | `GET http://localhost:8081/search-payments/?payment_method={method}` |
+|                   |                      | `or /?amount={amount}`                                        |
+|                   |                      | `or /?order_id={order_id}`                                    |
+
+
