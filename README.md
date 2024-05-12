@@ -23,7 +23,15 @@ performance and scalability.
 
 1. To run sql database locally first install [xamp](https://www.apachefriends.org/)
 
-2. Then run xamp manager (it may ask for root/admin permission) and start MYSQL Database and Apache Web Server, take note of the ports used as well as database user, password and name (you will use them in the .evn file)
+2. Then run xamp manager (it may ask for root/admin permission) and start MYSQL Database and Apache Web Server.
+3. Make a new database using the sql file provided in this wiki: ```https://gitlab.stud.idi.ntnu.no/yasinmh/e-commerce-website-database/-/wikis/home```
+4. Note!!: you can clone the wiki using this command: 
+   ``` 
+   git clone git@gitlab.stud.idi.ntnu.no:yasinmh/e-commerce-website-database.wiki.git
+   cd e-commerce-website-database.wiki
+   ```
+5. note!!: keep ports used as well as database user, password and name ready because you will use them in the .evn file
+
 
 ##### Common steps for running locally or using deployed server
 
@@ -31,7 +39,7 @@ Ensure you have Golang and MySQL installed on your system. Follow these steps to
 
 1. Clone the repository:
    ```
-   git clone https://yourrepositorylink.com/yourproject.git
+   git clone git@gitlab.stud.idi.ntnu.no:yasinmh/e-commerce-website-database.git
     ```
 2. Navigate into the project directory:
     ```
@@ -65,10 +73,20 @@ go run ./cmd/main.go
 ## API Endpoints
 
 Below are detailed descriptions of the API endpoints including request methods, paths, expected requests, and responses.
+1. note!!: most of the id's are made up just to give an example,
+   to be able to actually make a post, delete or put request, 
+   foreign keys id's needs to be retried and used in the requests. 
+2. Please consider using the postman file provided in the wiki page for testing.(see setup and installation part to 
+for command to download the file from wiki)
+3. All the requests are made based on the local running of the code, to test the backend deployment please see 
+the link provided in the report and replace is with the "http//:localhost:8081"
 
 ### Products
 
 **GET /products**: Retrieves all products.
+```
+http://localhost:8081/products
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -88,6 +106,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /products**: Adds a new product to the catalog.
+```
+http://localhost:8081/products
+```
 **Request Body**:
 
 ```
@@ -113,6 +134,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /products/{id}**: Deletes a product by ID.
+```
+http://localhost:8081/products/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -124,7 +148,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /products/{id}**: Updates a product by ID.
-
+```
+http://localhost:8081/products/{id}
+```
 **Request Body**:
 
 ```
@@ -152,7 +178,10 @@ Below are detailed descriptions of the API endpoints including request methods, 
 
 **GET /users**: Retrieves all registered users.
 **Response**: Status: 200 OK
-
+```
+http://localhost:8081/users/{id}
+http://localhost:8081/users
+```
 **Body**:
 
 ```
@@ -170,6 +199,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /users**: Registers a new user.
+```
+http://localhost:8081/users/{id}
+```
 **Request Body**:
 
 ```
@@ -195,6 +227,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /users/{id}**: Deletes a user by ID.
+```
+http://localhost:8081/users/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -206,7 +241,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /users/{id}**: Updates a user by ID.
-
+```
+http://localhost:8081/users/{id}
+```
 **Request Body**:
 
 ```
@@ -233,6 +270,10 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ### Orders
 
 **GET /orders**: Retrieves all orders.
+```
+http://localhost:8081/orders/{id}
+http://localhost:8081/orders
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -253,7 +294,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /orders**: Creates a new order.
-
+```
+http://localhost:8081/orders/{id}
+```
 **Request Body**:
 
 ```
@@ -277,6 +320,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /orders/{id}**: Deletes an order by ID.
+```
+http://localhost:8081/orders/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -288,7 +334,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /orders/{id}**: Updates an order by ID.
-
+```
+http://localhost:8081/orders/{id}
+```
 **Request Body**:
 
 ```
@@ -313,6 +361,11 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ### Payments
 
 **GET /payments**: Retrieves all payments.
+```
+http://localhost:8081/payments/{id}
+http://localhost:8081/payments
+```
+
 **Response**: Status: 200 OK
 
 **Body**:
@@ -333,6 +386,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **GET /payments/{id}**: Retrieves a payment by ID.
+```
+http://localhost:8081/payments/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -350,7 +406,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /payments**: Processes a payment for an order.
-
+```
+http://localhost:8081/payments/{id}
+```
 **Request Body**:
 
 ```
@@ -374,6 +432,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /payments/{id}**: Deletes a payment by ID.
+```
+http://localhost:8081/payments/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -385,7 +446,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /payments/{id}**: Updates a payment by ID.
-
+```
+http://localhost:8081/payments/{id}
+```
 **Request Body**:
 
 ```
@@ -411,6 +474,10 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ### orderItems
 
 **GET /orderItems**: Retrieves all orderItems.
+```
+http://localhost:8081/orderItems/{id}
+http://localhost:8081/orderItems/
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -429,7 +496,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /orderItems**: Adds a new orderItem to the order.
-
+```
+http://localhost:8081/orderItems/{id}
+```
 **Request Body**:
 
 ```
@@ -453,7 +522,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /orderItems/{id}**: Deletes an orderItem by ID.
-
+```
+http://localhost:8081/orderItems/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -465,7 +536,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /orderItems/{id}**: Updates an orderItem by ID.
-
+```
+http://localhost:8081/orderItems/{id}
+```
 **Request Body**:
 
 ```
@@ -490,6 +563,10 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ### Category
 
 **GET /categories**: Retrieves all categories.
+```
+http://localhost:8081/categories/{id}
+http://localhost:8081/categories
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -506,7 +583,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /categories**: Adds a new category to the catalog.
-
+```
+http://localhost:8081/categories/{id}
+```
 **Request Body**:
 
 ```
@@ -528,6 +607,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /categories/{id}**: Deletes a category by ID.
+```
+http://localhost:8081/categories/{id}
+```
 
 **Response**: Status: 200 OK
 
@@ -540,6 +622,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /categories/{id}**: Updates a category by ID.
+```
+http://localhost:8081/categories/{id}
+```
 
 **Request Body**:
 
@@ -563,6 +648,10 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ### brand
 
 **GET /brand**: Retrieves all brands.
+```
+http://localhost:8081/brand/{id}
+http://localhost:8081/brand
+```
 
 **Response**: Status: 200 OK
 
@@ -581,7 +670,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **POST /brand**: Adds a new brand to the catalog.
-
+```
+http://localhost:8081/brand/{id}
+```
 **Request Body**:
 
 ```
@@ -603,7 +694,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **DELETE /brand/{id}**: Deletes a brand by ID.
-
+```
+http://localhost:8081/brand/{id}
+```
 **Response**: Status: 200 OK
 
 **Body**:
@@ -615,7 +708,9 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 
 **PUT /brand/{id}**: Updates a brand by ID.
-
+```
+http://localhost:8081/brand/{id}
+```
 **Request Body**:
 
 ```
@@ -632,6 +727,216 @@ Below are detailed descriptions of the API endpoints including request methods, 
 ```
 {
     "message": "Brand updated successfully."
+}
+```
+### review
+
+**GET /reviews**: Retrieves all reviews.
+```
+http://localhost:8081/reviews/{id}
+http://localhost:8081/reviews
+```
+
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+[
+    {
+        "ID": 1516010785,
+        "CreatedAt": "2024-04-27T07:57:40Z",
+        "UpdatedAt": "2024-04-27T07:57:40Z",
+        "DeletedAt": null,
+        "product_id": 1192428622,
+        "user_id": 4265253256,
+        "rating": 0,
+        "comment": "this is a bad product",
+        "review_date": "2025-04-20T00:00:00Z"
+    }
+    ...
+]
+```
+
+**POST /reviews**: Adds a new review to the catalog.
+```
+http://localhost:8081/reviews/{id}
+```
+**Request Body**:
+
+```
+{
+        "product_id": 1192228322,
+        "user_id": 4261254256,
+        "rating": 2,
+        "comment": "this is a new test review",
+        "review_date": "2025-04-20"
+    }
+```
+
+**Response**: Status: 201 Created
+
+**Body**:
+
+```
+{
+    "ID": 1402172417,
+    "CreatedAt": "2024-05-12T10:36:14.081+02:00",
+    "UpdatedAt": "2024-05-12T10:36:14.081+02:00",
+    "DeletedAt": null,
+    "product_id": 1192128622,
+    "user_id": 4265255256,
+    "rating": 2,
+    "comment": "this is a new test review",
+    "review_date": "2025-04-20"
+}
+```
+
+**DELETE /reviews/{id}**: Deletes a reviews by ID.
+```
+http://localhost:8081/reviews/{id}
+```
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+{
+    "message": "reviews deleted successfully."
+}
+```
+
+**PUT /reviews/{id}**: Updates a reviews by ID.
+```
+http://localhost:8081/reviews/{id}
+```
+**Request Body**:
+
+```
+{
+    
+    "ID": 1402172417,
+    "CreatedAt": "2024-05-12T10:36:14.081+02:00",
+    "UpdatedAt": "2024-05-12T10:36:14.081+02:00",
+    "DeletedAt": null,
+    "product_id": 1192128622,
+    "user_id": 4265255256,
+    "rating": 4, -> this value to be changed.
+    "comment": "this is a new test review",
+    "review_date": "2025-04-20"
+
+}
+```
+
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+{
+    "message": "reviews updated successfully."
+}
+```
+### shippingDetails
+
+**GET /shippingDetails**: Retrieves all shippingDetails.
+```
+http://localhost:8081/shippingDetails/{id}
+http://localhost:8081/shippingDetails
+```
+
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+[
+    {
+        "ID": 1359557427,
+        "CreatedAt": "2024-04-27T05:48:35Z",
+        "UpdatedAt": "2024-04-27T05:48:35Z",
+        "DeletedAt": null,
+        "order_id": 1350357487,
+        "address": "In any where",
+        "shipping_date": "2025-04-20T00:00:00Z",
+        "estimated_arrival": "2026-04-30T00:00:00Z",
+        "status": "completed"
+    }
+    ...
+]
+```
+
+**POST /shippingDetails**: Adds a new shippingDetails to the catalog.
+```
+http://localhost:8081/shippingDetails/{id}
+```
+**Request Body**:
+
+```
+{
+        "order_id": 1352357487,
+        "address": "test adress",
+        "shipping_date": "2025-04-20",
+        "estimated_arrival": "2026-04-30",
+        "status": "completed"
+    }
+```
+
+**Response**: Status: 201 Created
+
+**Body**:
+
+```
+{
+    "ID": 1828821868,
+    "CreatedAt": "2024-05-12T10:43:49.148+02:00",
+    "UpdatedAt": "2024-05-12T10:43:49.148+02:00",
+    "DeletedAt": null,
+    "order_id": 1359350487,
+    "address": "test adress",
+    "shipping_date": "2025-04-20",
+    "estimated_arrival": "2026-04-30",
+    "status": "completed"
+}
+```
+
+**DELETE /shippingDetails/{id}**: Deletes a shippingDetails by ID.
+```
+http://localhost:8081/shippingDetails/{id}
+```
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+{
+    "message": "shippingDetails deleted successfully."
+}
+```
+
+**PUT /shippingDetails/{id}**: Updates a shippingDetails by ID.
+```
+http://localhost:8081/shippingDetails/{id}
+```
+**Request Body**:
+
+```
+{
+        "order_id": 1359357487,
+        "address": "new test adress", -> this value to be updated
+        "shipping_date": "2025-04-20",
+        "estimated_arrival": "2026-04-30",
+        "status": "completed"
+    }
+```
+
+**Response**: Status: 200 OK
+
+**Body**:
+
+```
+{
+    "message": "shippingDetails updated successfully."
 }
 ```
 
